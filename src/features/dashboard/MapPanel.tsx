@@ -102,34 +102,35 @@ function MapContent({
       zoom={13}
       options={MAP_OPTIONS}
     >
+      {/* Destinos e polilinhas primeiro — ficam abaixo dos marcadores de carro */}
+      {activeRequests.map((req) => {
+        const dest = destinations[req.id]
+        if (!dest) return null
+        const carLoc = locations.find((l) => l.car_id === req.assigned_car_id)
+        if (!carLoc) return null
+        return (
+          <Fragment key={req.id}>
+            <DestinationMarker request={req} position={dest} />
+            <Polyline
+              path={[{ lat: carLoc.latitude, lng: carLoc.longitude }, dest]}
+              options={{
+                strokeColor: '#E91E8C',
+                strokeOpacity: 0.7,
+                strokeWeight: 2,
+                geodesic: true,
+              }}
+            />
+          </Fragment>
+        )
+      })}
+
+      {/* Marcadores de carro por último — ficam sempre acima dos destinos */}
       {locations.map((loc) => {
         const car = cars.find((c) => c.id === loc.car_id)
         if (!car) return null
         const noSignal = now - new Date(loc.recorded_at).getTime() > TWO_MINUTES_MS
         return (
           <CarMarker key={loc.car_id} car={car} location={loc} noSignal={noSignal} />
-        )
-      })}
-
-      {activeRequests.map((req) => {
-        const dest = destinations[req.id]
-        if (!dest) return null
-        const carLoc = locations.find((l) => l.car_id === req.assigned_car_id)
-        return (
-          <Fragment key={req.id}>
-            <DestinationMarker request={req} position={dest} />
-            {carLoc && (
-              <Polyline
-                path={[{ lat: carLoc.latitude, lng: carLoc.longitude }, dest]}
-                options={{
-                  strokeColor: '#E91E8C',
-                  strokeOpacity: 0.7,
-                  strokeWeight: 2,
-                  geodesic: true,
-                }}
-              />
-            )}
-          </Fragment>
         )
       })}
     </GoogleMap>
