@@ -23,13 +23,19 @@ function NotificationsWatcher() {
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const role = useAuth((s) => s.role)
-  if (role !== 'central_admin') return <Navigate to="/dashboard" replace />
+  if (role !== 'central_admin') return <Navigate to="/requests" replace />
+  return <>{children}</>
+}
+
+function DashboardRoute({ children }: { children: React.ReactNode }) {
+  const role = useAuth((s) => s.role)
+  if (role !== 'central_admin' && role !== 'central_operator') return <Navigate to="/requests" replace />
   return <>{children}</>
 }
 
 function CentralRoute({ children }: { children: React.ReactNode }) {
   const role = useAuth((s) => s.role)
-  if (role !== 'central_admin' && role !== 'central_operator') return <Navigate to="/dashboard" replace />
+  if (role !== 'central_admin' && role !== 'central_operator') return <Navigate to="/requests" replace />
   return <>{children}</>
 }
 
@@ -56,7 +62,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<ProtectedRoute><RoleRoute /></ProtectedRoute>} />
           <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
-            <Route path="/dashboard" element={<ErrorBoundary><DashboardPage /></ErrorBoundary>} />
+            <Route path="/dashboard" element={<DashboardRoute><ErrorBoundary><DashboardPage /></ErrorBoundary></DashboardRoute>} />
             <Route path="/requests" element={<ErrorBoundary><RequestsListPage /></ErrorBoundary>} />
             <Route path="/requests/new" element={<ErrorBoundary><NewRequestPage /></ErrorBoundary>} />
             <Route path="/admin/create-user" element={<AdminRoute><ErrorBoundary><CreateUserPage /></ErrorBoundary></AdminRoute>} />
