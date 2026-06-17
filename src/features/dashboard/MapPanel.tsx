@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { GoogleMap, LoadScript, OverlayView } from '@react-google-maps/api'
+import { GoogleMap, LoadScript } from '@react-google-maps/api'
 import { supabase } from '../../lib/supabase'
 import { CarMarker } from './CarMarker'
 import { useCarLocations, type CarLocation } from './useCarLocations'
