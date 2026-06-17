@@ -107,19 +107,20 @@ function MapContent({
         const dest = destinations[req.id]
         if (!dest) return null
         const carLoc = locations.find((l) => l.car_id === req.assigned_car_id)
-        if (!carLoc) return null
         return (
           <Fragment key={req.id}>
             <DestinationMarker request={req} position={dest} />
-            <Polyline
-              path={[{ lat: carLoc.latitude, lng: carLoc.longitude }, dest]}
-              options={{
-                strokeColor: '#E91E8C',
-                strokeOpacity: 0.7,
-                strokeWeight: 2,
-                geodesic: true,
-              }}
-            />
+            {carLoc && (
+              <Polyline
+                path={[{ lat: carLoc.latitude, lng: carLoc.longitude }, dest]}
+                options={{
+                  strokeColor: '#E91E8C',
+                  strokeOpacity: 0.7,
+                  strokeWeight: 2,
+                  geodesic: true,
+                }}
+              />
+            )}
           </Fragment>
         )
       })}
