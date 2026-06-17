@@ -8,6 +8,8 @@ import { RequestDetailSidebar } from './RequestDetailSidebar'
 import { RequestStatusBadge } from './RequestStatusBadge'
 import { useRequests, type Request } from './useRequests'
 
+const CENTRAL_ROLES = new Set(['central_admin', 'central_operator'])
+
 function formatDateBRT(isoString: string): string {
   const date = new Date(isoString)
   // BRT is UTC-3 (Brazil abolished DST in 2019 — fixed offset year-round)
@@ -19,8 +21,10 @@ const CANCELLABLE = new Set(['open', 'under_review'])
 
 export function RequestsListPage() {
   const navigate = useNavigate()
+  const role = useAuth((s) => s.role)
   const signOut = useAuth((s) => s.signOut)
-  const { requests, setRequests, loading, error, getMyRequests, cancelRequest } = useRequests()
+  const isCentral = CENTRAL_ROLES.has(role ?? '')
+  const { requests, setRequests, loading, error, getMyRequests, getAllRequests, cancelRequest } = useRequests()
 
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
@@ -29,11 +33,15 @@ export function RequestsListPage() {
   const userIdRef = useRef<string | null>(null)
 
   useEffect(() => {
-    getMyRequests()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      userIdRef.current = user?.id ?? null
-    })
-  }, [getMyRequests])
+    if (isCentral) {
+      getAllRequests()
+    } else {
+      getMyRequests()
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        userIdRef.current = user?.id ?? null
+      })
+    }
+  }, [isCentral, getAllRequests, getMyRequests])
 
   useEffect(() => {
     const channel = supabase
@@ -43,7 +51,7 @@ export function RequestsListPage() {
         { event: '*', schema: 'public', table: 'requests' },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            if (payload.new.leader_user_id === userIdRef.current) {
+            if (isCentral || payload.new.leader_user_id === userIdRef.current) {
               setRequests((prev) => [payload.new as Request, ...prev])
             }
           } else if (payload.eventType === 'UPDATE') {
@@ -78,7 +86,9 @@ export function RequestsListPage() {
     <div className="min-h-screen bg-zinc-950 p-6">
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-zinc-100 text-xl font-semibold">Minhas Solicitações</h1>
+          <h1 className="text-zinc-100 text-xl font-semibold">
+            {isCentral ? 'Todas as Solicitações' : 'Minhas Solicitações'}
+          </h1>
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" onClick={signOut}>Sair</Button>
             <Button size="sm" onClick={() => navigate('/requests/new')}>+ Nova Solicitação</Button>

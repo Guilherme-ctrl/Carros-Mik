@@ -54,6 +54,23 @@ export function useRequests() {
     }
   }, [])
 
+  const getAllRequests = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { data, error: dbError } = await supabase
+        .from('requests')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (dbError) throw new Error(dbError.message)
+      setRequests(data ?? [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao buscar solicitações')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   const createRequest = useCallback(async (params: {
     leader_id: string
     event: string
@@ -84,5 +101,5 @@ export function useRequests() {
     if (dbError) throw new Error(dbError.message)
   }, [])
 
-  return { requests, setRequests, loading, error, getMyRequests, createRequest, cancelRequest }
+  return { requests, setRequests, loading, error, getMyRequests, getAllRequests, createRequest, cancelRequest }
 }

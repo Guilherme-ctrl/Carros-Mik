@@ -3,6 +3,7 @@ import { useAuth } from '../../features/auth/useAuth'
 
 const NAV = [
   { to: '/dashboard', label: 'Dashboard', roles: null },
+  { to: '/requests', label: 'Solicitações', roles: ['central_admin', 'central_operator'] },
   { to: '/admin/leaders', label: 'Líderes', roles: ['central_admin', 'central_operator'] },
   { to: '/admin/cars', label: 'Carros', roles: ['central_admin', 'central_operator'] },
   { to: '/admin/users', label: 'Usuários', roles: ['central_admin'] },
