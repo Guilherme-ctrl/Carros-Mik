@@ -6,14 +6,10 @@ interface Props {
   position: { lat: number; lng: number }
 }
 
-function getPixelOffset(w: number, h: number) {
-  return { x: -(w / 2), y: -h }
-}
-
 export function DestinationMarker({ request, position }: Props) {
   const label =
-    request.objective.length > 22
-      ? request.objective.slice(0, 22) + '…'
+    request.objective.length > 20
+      ? request.objective.slice(0, 20) + '…'
       : request.objective
 
   const title = [
@@ -26,10 +22,25 @@ export function DestinationMarker({ request, position }: Props) {
     <OverlayView
       position={position}
       mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-      getPixelPositionOffset={getPixelOffset}
+      getPixelPositionOffset={(w, h) => ({ x: -(w / 2), y: -h })}
     >
-      <div className="flex flex-col items-center select-none" title={title}>
-        <div className="bg-[#E91E8C] text-white text-[11px] font-bold px-2.5 py-1 rounded shadow-lg whitespace-nowrap max-w-[140px] truncate">
+      <div style={{ display: 'inline-block', userSelect: 'none', cursor: 'default' }} title={title}>
+        <div
+          style={{
+            backgroundColor: '#E91E8C',
+            color: '#fff',
+            fontSize: '11px',
+            fontWeight: 700,
+            lineHeight: '1.3',
+            padding: '3px 8px',
+            borderRadius: '4px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            maxWidth: '130px',
+          }}
+        >
           {label}
         </div>
         <div
@@ -39,6 +50,7 @@ export function DestinationMarker({ request, position }: Props) {
             borderLeft: '6px solid transparent',
             borderRight: '6px solid transparent',
             borderTop: '8px solid #E91E8C',
+            margin: '0 auto',
           }}
         />
       </div>
