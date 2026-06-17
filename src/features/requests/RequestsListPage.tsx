@@ -11,10 +11,14 @@ import { useRequests, type Request } from './useRequests'
 const CENTRAL_ROLES = new Set(['central_admin', 'central_operator'])
 
 function formatDateBRT(isoString: string): string {
-  const date = new Date(isoString)
-  // BRT is UTC-3 (Brazil abolished DST in 2019 — fixed offset year-round)
-  const brt = new Date(date.getTime() - 3 * 60 * 60 * 1000)
-  return format(brt, 'dd/MM HH:mm')
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(isoString)).replace(', ', ' ')
 }
 
 const CANCELLABLE = new Set(['open', 'under_review'])
@@ -52,7 +56,11 @@ export function RequestsListPage() {
         (payload) => {
           if (payload.eventType === 'INSERT') {
             if (isCentral || payload.new.leader_user_id === userIdRef.current) {
-              setRequests((prev) => [payload.new as Request, ...prev])
+              setRequests((prev) =>
+                prev.some((r) => r.id === payload.new.id)
+                  ? prev
+                  : [payload.new as Request, ...prev]
+              )
             }
           } else if (payload.eventType === 'UPDATE') {
             setRequests((prev) =>

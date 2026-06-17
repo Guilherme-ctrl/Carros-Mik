@@ -10,9 +10,15 @@ import type { Car } from '../cars/useCars'
 import type { RequestWithLeader } from './useAllRequests'
 
 function formatDateBRT(iso: string): string {
-  const d = new Date(iso)
-  const brt = new Date(d.getTime() - 3 * 60 * 60 * 1000)
-  return format(brt, 'dd/MM/yyyy HH:mm')
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(iso)).replace(', ', ' ')
 }
 
 interface Props {

@@ -18,11 +18,14 @@ interface LeaderInfo {
 }
 
 function formatDateBRT(isoString: string): string {
-  const date = new Date(isoString)
-  const brt = new Date(date.getTime() - 3 * 60 * 60 * 1000)
-  return brt.toLocaleString('pt-BR', {
-    day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
-  })
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(isoString)).replace(', ', ' ')
 }
 
 interface Props {
