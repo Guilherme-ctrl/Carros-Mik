@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Inter:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Brand */
+  --color-brand-pink:       #E91E8C;
+  --color-brand-pink-dark:  #B5146D;
+  --color-brand-pink-light: #FF4DB2;
+  --color-brand-pink-muted: #3D0A25;
+
+  /* Surfaces */
+  --color-surface-0: #0D0D18;
+  --color-surface-1: #16162A;
+  --color-surface-2: #21213A;
+  --color-surface-3: #2D2D4E;
+
+  /* On-surface */
+  --color-on-surface:          #F2F2F2;
+  --color-on-surface-muted:    #8A8AB0;
+  --color-on-surface-disabled: #44445A;
+
+  /* Status */
+  --color-status-available:     #22C55E;
+  --color-status-available-bg:  #0D2E1A;
+  --color-status-busy:          #F59E0B;
+  --color-status-busy-bg:       #2E1F05;
+  --color-status-unavailable:   #EF4444;
+  --color-status-unavailable-bg:#2E0808;
+  --color-status-pending:       #60A5FA;
+  --color-status-pending-bg:    #0A1829;
+  --color-status-done:          #A78BFA;
+  --color-status-done-bg:       #150D2E;
+
+  /* Typography */
+  --font-display: 'Poppins', sans-serif;
+  --font-body:    'Inter', sans-serif;
+
+  /* Radius */
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-full: 9999px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--color-surface-0);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
