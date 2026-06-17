@@ -84,7 +84,7 @@ export function NewRequestPage() {
     'w-full rounded-lg border bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 resize-none transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50'
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-6">
+    <div className="flex-1 overflow-y-auto bg-zinc-950 p-6">
       <div className="max-w-lg mx-auto space-y-6">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" onClick={() => navigate('/requests')}>

@@ -83,7 +83,7 @@ export function RequestsListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-6">
+    <div className="flex-1 overflow-y-auto bg-zinc-950 p-6">
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-zinc-100 text-xl font-semibold">
