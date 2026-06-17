@@ -163,7 +163,7 @@ export function DashboardPage() {
           selectedRequest={selectedRequest}
           onInitiateAssign={handleInitiateAssign}
         />
-        <MapPanel cars={cars} />
+        <MapPanel cars={cars} requests={requests} />
       </main>
 
       {/* Mobile/tablet: single active panel */}
@@ -187,7 +187,7 @@ export function DashboardPage() {
             fullWidth
           />
         )}
-        {activeTab === 'map' && <MapPanel cars={cars} />}
+        {activeTab === 'map' && <MapPanel cars={cars} requests={requests} />}
       </main>
 
       <RequestDetailSidebar
