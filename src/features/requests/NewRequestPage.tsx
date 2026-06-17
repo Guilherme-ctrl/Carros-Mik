@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { Button } from '../../shared/components/ui/Button'
 import { Input } from '../../shared/components/ui/Input'
+import { AddressAutocompleteInput } from '../../shared/components/ui/AddressAutocompleteInput'
 import { useLeaders } from '../leaders/useLeaders'
 import { useRequests } from './useRequests'
 
@@ -140,6 +141,16 @@ export function NewRequestPage() {
               </select>
               {errors.leaderId && <p className="text-xs text-red-400">{errors.leaderId}</p>}
             </div>
+
+            <AddressAutocompleteInput
+              onSelect={({ street: s, neighborhood: n }) => {
+                setStreet(s)
+                setNeighborhood(n)
+                clearError('street')
+                clearError('neighborhood')
+              }}
+              disabled={loading}
+            />
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <div className="col-span-1 sm:col-span-2">
