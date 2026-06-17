@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { format } from 'date-fns'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../auth/useAuth'
 import { Button } from '../../shared/components/ui/Button'
