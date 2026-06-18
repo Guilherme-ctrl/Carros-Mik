@@ -24,9 +24,11 @@ interface Props {
   selectedId: string | null
   onSelectRequest: (request: RequestWithLeader) => void
   fullWidth?: boolean
+  isOpen?: boolean
+  onToggle?: () => void
 }
 
-export function RequestsPanel({ requests, loading, error, selectedId, onSelectRequest, fullWidth }: Props) {
+export function RequestsPanel({ requests, loading, error, selectedId, onSelectRequest, fullWidth, isOpen, onToggle }: Props) {
   const [statusFilter, setStatusFilter] = useState<RequestStatus | 'all'>('all')
 
   const activeRequests = requests.filter((r) => ACTIVE_STATUSES.includes(r.status))
@@ -37,17 +39,40 @@ export function RequestsPanel({ requests, loading, error, selectedId, onSelectRe
   const historyRequests = requests.filter((r) => HISTORY_STATUSES.includes(r.status))
   const openCount = requests.filter((r) => r.status === 'open').length
 
+  const containerClass = fullWidth
+    ? 'flex-1 w-full flex flex-col border-r border-zinc-800 overflow-hidden'
+    : 'min-w-0 overflow-hidden flex flex-col border-r border-zinc-800'
+
   return (
-    <div className={`${fullWidth ? 'flex-1 w-full' : 'w-96 flex-shrink-0'} flex flex-col border-r border-zinc-800 overflow-hidden`}>
+    <div className={containerClass}>
       {/* Panel header */}
       <div className="px-4 py-3 border-b border-zinc-800 shrink-0">
         <div className="flex items-center justify-between mb-2">
           <span className="text-zinc-100 text-sm font-semibold">Solicitações</span>
-          {openCount > 0 && (
-            <span className="rounded-full bg-blue-600 text-white text-xs font-bold px-2 py-0.5 min-w-[20px] text-center">
-              {openCount}
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {openCount > 0 && (
+              <span className="rounded-full bg-blue-600 text-white text-xs font-bold px-2 py-0.5 min-w-[20px] text-center">
+                {openCount}
+              </span>
+            )}
+            {onToggle && (
+              <button
+                onClick={onToggle}
+                className="p-1 text-zinc-500 hover:text-zinc-100 transition-colors rounded"
+                aria-label={isOpen ? 'Minimizar painel' : 'Restaurar painel'}
+              >
+                {isOpen !== false ? (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </button>
+            )}
+          </div>
         </div>
         <div className="flex gap-1 flex-wrap">
           <FilterChip

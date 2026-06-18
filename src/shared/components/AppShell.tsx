@@ -4,7 +4,7 @@ import { Sidebar } from './Sidebar'
 
 const NAV = [
   { to: '/dashboard',     label: 'Dashboard',    roles: ['central_admin', 'central_operator'] },
-  { to: '/requests',      label: 'Solicitações', roles: ['central_admin', 'central_operator', 'table_leader'] },
+  { to: '/requests', label: 'Solicitações', roles: ['central_admin', 'central_operator', 'table_leader'] },
   { to: '/admin/leaders', label: 'Líderes',      roles: ['central_admin', 'central_operator'] },
   { to: '/admin/cars',    label: 'Carros',       roles: ['central_admin', 'central_operator'] },
   { to: '/admin/users',   label: 'Usuários',     roles: ['central_admin'] },

@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { format } from 'date-fns'
 import { useComments } from './useComments'
+import { useAuth } from '../auth/useAuth'
 
 function formatBRT(iso: string): string {
   const d = new Date(iso)
   const brt = new Date(d.getTime() - 3 * 60 * 60 * 1000)
-  return format(brt, 'dd/MM HH:mm')
+  return format(brt, 'HH:mm')
 }
 
 function initials(name: string): string {
@@ -29,11 +30,11 @@ interface Props {
 
 export function CommentsPanel({ requestId, contact }: Props) {
   const { comments, loading, addComment } = useComments(requestId)
+  const user = useAuth((s) => s.user)
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
-  // Auto-scroll whenever comments change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [comments])
@@ -45,6 +46,7 @@ export function CommentsPanel({ requestId, contact }: Props) {
     setText('')
     try {
       await addComment(trimmed)
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
     } finally {
       setSending(false)
     }
@@ -52,7 +54,7 @@ export function CommentsPanel({ requestId, contact }: Props) {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Contact buttons (T14.16) */}
+      {/* Contact buttons */}
       {(contact?.pilotPhone || contact?.leaderPhone) && (
         <div className="flex gap-2 flex-wrap">
           {contact.pilotPhone && (
@@ -78,33 +80,48 @@ export function CommentsPanel({ requestId, contact }: Props) {
         </div>
       )}
 
-      {/* Timeline */}
-      <div className="max-h-64 overflow-y-auto flex flex-col gap-2 pr-1">
+      {/* Message list */}
+      <div className="max-h-64 overflow-y-auto flex flex-col gap-1.5 pr-1">
         {loading && comments.length === 0 && (
           <p className="text-zinc-600 text-xs">Carregando comentários…</p>
         )}
         {!loading && comments.length === 0 && (
           <p className="text-zinc-600 text-xs">Nenhum comentário ainda.</p>
         )}
-        {comments.map((c) => (
-          <div key={c.id} className="flex gap-2 items-start">
-            <div className="shrink-0 w-7 h-7 rounded-full bg-pink-950 flex items-center justify-center">
-              <span className="text-pink-400 text-[10px] font-bold">{initials(c.author_name)}</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-1.5 flex-wrap">
-                <span className="text-zinc-200 text-xs font-semibold">{c.author_name}</span>
-                <span className="text-zinc-600 text-[10px]">{formatBRT(c.created_at)}</span>
+        {comments.map((c, i) => {
+          const isOwn = c.author_id === user?.id
+          const showAuthor = !isOwn && (i === 0 || comments[i - 1].author_id !== c.author_id)
+          return (
+            <div key={c.id} className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
+              {showAuthor && (
+                <div className="flex items-center gap-1 mb-0.5 ml-1">
+                  <div className="w-4 h-4 rounded-full bg-pink-950 flex items-center justify-center shrink-0">
+                    <span className="text-pink-400 text-[8px] font-bold">{initials(c.author_name)}</span>
+                  </div>
+                  <span className="text-pink-400 text-[10px] font-semibold">{c.author_name}</span>
+                </div>
+              )}
+              <div
+                className={[
+                  'max-w-[80%] px-3 py-1.5 text-xs text-zinc-100 break-words',
+                  isOwn
+                    ? 'bg-pink-950 border border-pink-800/40 rounded-tl-xl rounded-bl-xl rounded-tr-sm rounded-br-xl'
+                    : 'bg-zinc-800 border border-zinc-700 rounded-tr-xl rounded-br-xl rounded-tl-sm rounded-bl-xl',
+                ].join(' ')}
+              >
+                <p className="leading-relaxed">{c.content}</p>
+                <p className={`text-[10px] mt-0.5 ${isOwn ? 'text-pink-400/60 text-right' : 'text-zinc-500'}`}>
+                  {formatBRT(c.created_at)}
+                </p>
               </div>
-              <p className="text-zinc-300 text-xs mt-0.5 break-words">{c.content}</p>
             </div>
-          </div>
-        ))}
+          )
+        })}
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <div className="flex gap-2 items-end">
+      {/* Input — sticky so it stays visible when the sidebar is scrolled */}
+      <div className="sticky bottom-0 bg-zinc-950 pt-1 flex gap-2 items-end">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}

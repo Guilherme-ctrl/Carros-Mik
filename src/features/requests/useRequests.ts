@@ -11,6 +11,8 @@ export type RequestStatus =
   | 'completed'
   | 'cancelled'
 
+export type RequestOutcome = 'found' | 'not_found'
+
 export interface Request {
   id: string
   leader_id: string
@@ -24,6 +26,7 @@ export interface Request {
   maps_link: string | null
   notes: string | null
   status: RequestStatus
+  outcome: RequestOutcome | null
   assigned_car_id: string | null
   created_at: string
   updated_at: string

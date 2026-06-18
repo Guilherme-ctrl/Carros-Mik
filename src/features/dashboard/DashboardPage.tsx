@@ -25,6 +25,7 @@ export function DashboardPage() {
   const [selectedRequest, setSelectedRequest] = useState<RequestWithLeader | null>(null)
   const [pendingAssignment, setPendingAssignment] = useState<PendingAssignment | null>(null)
   const [activeTab, setActiveTab] = useState<ActiveTab>('requests')
+  const [requestsPanelOpen, setRequestsPanelOpen] = useState(true)
 
   const openCount = requests.filter((r) => r.status === 'open').length
 
@@ -130,7 +131,7 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0">
+    <div className="relative flex flex-col flex-1 min-h-0">
       {/* Tab bar — visible only on tablet/mobile (< lg) */}
       <div className="flex lg:hidden border-b border-zinc-800 bg-zinc-950 shrink-0">
         {(['requests', 'cars', 'map'] as ActiveTab[]).map((tab) => (
@@ -148,14 +149,24 @@ export function DashboardPage() {
         ))}
       </div>
 
-      {/* Desktop: 3-column layout */}
-      <main className="hidden lg:flex flex-1 overflow-hidden min-h-0">
+      {/* Desktop: 3-column grid layout */}
+      <main
+        className="hidden lg:grid flex-1 overflow-hidden min-h-0"
+        style={{
+          gridTemplateColumns: requestsPanelOpen
+            ? '[requests] 24rem [missions] 20rem [map] 1fr'
+            : '[requests] 0px [missions] 20rem [map] 1fr',
+          transition: 'grid-template-columns 250ms ease-in-out',
+        }}
+      >
         <RequestsPanel
           requests={requests}
           loading={requestsLoading}
           error={requestsError}
           selectedId={selectedRequest?.id ?? null}
           onSelectRequest={setSelectedRequest}
+          isOpen={requestsPanelOpen}
+          onToggle={() => setRequestsPanelOpen((p) => !p)}
         />
         <CarsPanel
           cars={cars}
@@ -165,6 +176,21 @@ export function DashboardPage() {
         />
         <MapPanel cars={cars} requests={requests} />
       </main>
+
+      {/* Floating restore button — desktop only, shown when panel is minimised */}
+      {!requestsPanelOpen && (
+        <button
+          onClick={() => setRequestsPanelOpen(true)}
+          className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 flex-col items-center gap-1.5 bg-zinc-900 border border-zinc-700 border-l-0 rounded-r-lg px-1.5 py-3 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          {openCount > 0 && (
+            <span className="text-xs font-bold text-blue-400 leading-none">{openCount}</span>
+          )}
+        </button>
+      )}
 
       {/* Mobile/tablet: single active panel */}
       <main className="flex lg:hidden flex-1 overflow-hidden min-h-0">

@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { RequestStatusBadge } from './RequestStatusBadge'
 import { RequestTimeline } from './RequestTimeline'
 import { CommentsPanel } from './CommentsPanel'
+import { OutcomeBadge } from './OutcomeBadge'
 import type { Request } from './useRequests'
 
 interface CarInfo {
@@ -84,6 +85,7 @@ export function RequestDetailSidebar({ request, onClose }: Props) {
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-zinc-100 font-semibold text-base truncate">{request.event}</h2>
               <RequestStatusBadge status={request.status} />
+              {request.outcome && <OutcomeBadge outcome={request.outcome} />}
             </div>
             <p className="text-zinc-500 text-xs mt-0.5">Etapa {request.stage} · {formatDateBRT(request.created_at)}</p>
           </div>

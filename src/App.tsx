@@ -8,6 +8,7 @@ import { useNotifications } from './features/notifications/useNotifications'
 import { CarsPage } from './features/cars/CarsPage'
 import { DashboardPage } from './features/dashboard/DashboardPage'
 import { LeadersPage } from './features/leaders/LeadersPage'
+import { KanbanPage } from './features/requests/KanbanPage'
 import { NewRequestPage } from './features/requests/NewRequestPage'
 import { RequestsListPage } from './features/requests/RequestsListPage'
 import { UsersPage } from './features/users/UsersPage'
@@ -63,7 +64,8 @@ export default function App() {
           <Route path="/" element={<ProtectedRoute><RoleRoute /></ProtectedRoute>} />
           <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route path="/dashboard" element={<DashboardRoute><ErrorBoundary><DashboardPage /></ErrorBoundary></DashboardRoute>} />
-            <Route path="/requests" element={<ErrorBoundary><RequestsListPage /></ErrorBoundary>} />
+            <Route path="/requests" element={<ErrorBoundary><KanbanPage /></ErrorBoundary>} />
+            <Route path="/requests/kanban" element={<ErrorBoundary><KanbanPage /></ErrorBoundary>} />
             <Route path="/requests/new" element={<ErrorBoundary><NewRequestPage /></ErrorBoundary>} />
             <Route path="/admin/create-user" element={<AdminRoute><ErrorBoundary><CreateUserPage /></ErrorBoundary></AdminRoute>} />
             <Route path="/admin/users" element={<AdminRoute><ErrorBoundary><UsersPage /></ErrorBoundary></AdminRoute>} />
