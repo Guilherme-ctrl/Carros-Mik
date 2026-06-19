@@ -7,9 +7,10 @@ interface Props {
   requests: Request[]
   emptyMessage: string
   onCardClick: (req: Request) => void
+  unreadCounts?: Record<string, number>
 }
 
-export function KanbanColumn({ label, headerClassName, requests, emptyMessage, onCardClick }: Props) {
+export function KanbanColumn({ label, headerClassName, requests, emptyMessage, onCardClick, unreadCounts }: Props) {
   return (
     <div className="flex flex-col min-h-0 rounded-xl border border-zinc-800 bg-zinc-900/40 overflow-hidden">
       <div className={`px-4 py-3 flex items-center justify-between shrink-0 border-b ${headerClassName}`}>
@@ -25,7 +26,12 @@ export function KanbanColumn({ label, headerClassName, requests, emptyMessage, o
           </div>
         ) : (
           requests.map((req) => (
-            <KanbanCard key={req.id} request={req} onClick={() => onCardClick(req)} />
+            <KanbanCard
+              key={req.id}
+              request={req}
+              onClick={() => onCardClick(req)}
+              unreadCount={unreadCounts?.[req.id]}
+            />
           ))
         )}
       </div>

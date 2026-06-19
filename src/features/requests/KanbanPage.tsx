@@ -7,6 +7,7 @@ import { RequestDetailSidebar } from './RequestDetailSidebar'
 import { useRequests, type Request } from './useRequests'
 import { KanbanColumn } from './components/KanbanColumn'
 import { getKanbanColumn } from './kanbanUtils'
+import { useUnreadMessageCounts } from '../notifications/useUnreadMessageCounts'
 
 const CENTRAL_ROLES = new Set(['central_admin', 'central_operator'])
 
@@ -18,6 +19,7 @@ export function KanbanPage() {
   const { requests, setRequests, loading, error, getMyRequests, getAllRequests } = useRequests()
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
   const userIdRef = useRef<string | null>(null)
+  const unreadCounts = useUnreadMessageCounts()
 
   useEffect(() => {
     if (isCentral) {
@@ -98,6 +100,7 @@ export function KanbanPage() {
             requests={todo}
             emptyMessage="Nenhuma solicitação pendente"
             onCardClick={setSelectedRequest}
+            unreadCounts={unreadCounts}
           />
           <KanbanColumn
             label="Fazendo"
@@ -105,6 +108,7 @@ export function KanbanPage() {
             requests={doing}
             emptyMessage="Nenhum carro em andamento"
             onCardClick={setSelectedRequest}
+            unreadCounts={unreadCounts}
           />
           <KanbanColumn
             label="Feito"
@@ -112,6 +116,7 @@ export function KanbanPage() {
             requests={done}
             emptyMessage="Nenhuma solicitação concluída"
             onCardClick={setSelectedRequest}
+            unreadCounts={unreadCounts}
           />
         </div>
       )}
