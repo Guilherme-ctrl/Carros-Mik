@@ -6,6 +6,7 @@ import { Button } from '../../shared/components/ui/Button'
 import { RequestDetailSidebar } from './RequestDetailSidebar'
 import { RequestStatusBadge } from './RequestStatusBadge'
 import { useRequests, type Request } from './useRequests'
+import { useUnreadMessageCounts } from '../notifications/useUnreadMessageCounts'
 
 const CENTRAL_ROLES = new Set(['central_admin', 'central_operator'])
 
@@ -31,6 +32,7 @@ export function RequestsListPage() {
 
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
+  const unreadCounts = useUnreadMessageCounts()
   const [cancelling, setCancelling] = useState(false)
   const [actionError, setActionError] = useState('')
   const userIdRef = useRef<string | null>(null)
@@ -125,8 +127,13 @@ export function RequestsListPage() {
         ) : (
           <div className="space-y-3">
             {requests.map((req) => (
+              <div key={req.id} className="relative">
+                {unreadCounts[req.id] > 0 && (
+                  <span className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                    {unreadCounts[req.id] > 9 ? '9+' : unreadCounts[req.id]}
+                  </span>
+                )}
               <div
-                key={req.id}
                 className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 space-y-2 cursor-pointer hover:border-zinc-700 transition-colors"
                 onClick={() => setSelectedRequest(req)}
               >
@@ -171,6 +178,7 @@ export function RequestsListPage() {
                 {req.notes && (
                   <p className="text-zinc-500 text-xs border-t border-zinc-800 pt-2">{req.notes}</p>
                 )}
+              </div>
               </div>
             ))}
           </div>

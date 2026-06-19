@@ -13,37 +13,45 @@ interface Props {
   request: RequestWithLeader
   isSelected: boolean
   onClick: () => void
+  unreadCount?: number
 }
 
-export function RequestCard({ request, isSelected, onClick }: Props) {
+export function RequestCard({ request, isSelected, onClick, unreadCount }: Props) {
   const leaderName = request.leaders?.name ?? '—'
   const leaderTable = request.leaders?.table_name
 
   return (
-    <button
-      onClick={onClick}
-      className={`w-full text-left rounded-xl border p-3 space-y-1.5 transition-colors ${
-        isSelected
-          ? 'border-blue-500/50 bg-blue-500/5'
-          : 'border-zinc-800 bg-zinc-900/60 hover:border-zinc-700'
-      }`}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-zinc-100 text-xs font-semibold truncate">{request.event}</span>
-          <span className="text-zinc-500 text-xs shrink-0">· Etapa {request.stage}</span>
-        </div>
-        <span className="text-zinc-500 text-xs tabular-nums shrink-0">{elapsedLabel(request.created_at)}</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <RequestStatusBadge status={request.status} />
-        <span className="text-zinc-400 text-xs truncate">
-          {leaderName}{leaderTable ? ` · ${leaderTable}` : ''}
+    <div className="relative">
+      {unreadCount && unreadCount > 0 ? (
+        <span className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+          {unreadCount > 9 ? '9+' : unreadCount}
         </span>
-      </div>
-      <p className="text-zinc-500 text-xs truncate">
-        {request.street}, {request.street_number} — {request.neighborhood}
-      </p>
-    </button>
+      ) : null}
+      <button
+        onClick={onClick}
+        className={`w-full text-left rounded-xl border p-3 space-y-1.5 transition-colors ${
+          isSelected
+            ? 'border-blue-500/50 bg-blue-500/5'
+            : 'border-zinc-800 bg-zinc-900/60 hover:border-zinc-700'
+        }`}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-zinc-100 text-xs font-semibold truncate">{request.event}</span>
+            <span className="text-zinc-500 text-xs shrink-0">· Etapa {request.stage}</span>
+          </div>
+          <span className="text-zinc-500 text-xs tabular-nums shrink-0">{elapsedLabel(request.created_at)}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <RequestStatusBadge status={request.status} />
+          <span className="text-zinc-400 text-xs truncate">
+            {leaderName}{leaderTable ? ` · ${leaderTable}` : ''}
+          </span>
+        </div>
+        <p className="text-zinc-500 text-xs truncate">
+          {request.street}, {request.street_number} — {request.neighborhood}
+        </p>
+      </button>
+    </div>
   )
 }

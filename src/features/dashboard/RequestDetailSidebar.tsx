@@ -4,7 +4,7 @@ import { RequestStatusBadge } from '../requests/RequestStatusBadge'
 import { StatusTransitionButtons } from '../requests/StatusTransitionButtons'
 import { RequestTimeline } from '../requests/RequestTimeline'
 import { Button } from '../../shared/components/ui/Button'
-import { WhatsAppShareButton } from '../../shared/components/WhatsAppShareButton'
+import { WhatsAppContactButton } from '../../shared/components/WhatsAppContactButton'
 import type { Car } from '../cars/useCars'
 import type { RequestWithLeader } from './useAllRequests'
 
@@ -192,7 +192,21 @@ export function RequestDetailSidebar({ request, cars, onClose, onInitiateAssign 
           </div>
 
           <div className="px-5 py-4 border-t border-zinc-800 shrink-0 space-y-2">
-            <WhatsAppShareButton request={request} />
+            <WhatsAppContactButton
+              name={request.leaders?.name ?? ''}
+              phone={request.leaders?.phone}
+              messageTemplate="leader"
+            />
+            {(() => {
+              const assignedCar = cars.find((c) => c.id === request.assigned_car_id)
+              return assignedCar ? (
+                <WhatsAppContactButton
+                  name={assignedCar.pilot_name}
+                  phone={assignedCar.pilot_phone}
+                  messageTemplate="driver"
+                />
+              ) : null
+            })()}
             <Button variant="ghost" size="sm" className="w-full" onClick={onClose}>
               Fechar
             </Button>

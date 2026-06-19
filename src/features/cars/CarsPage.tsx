@@ -4,6 +4,7 @@ import { Button } from '../../shared/components/ui/Button'
 import { CarFormModal } from './CarFormModal'
 import { CarStatusBadge } from './CarStatusBadge'
 import { useCars, type Car, type CarOperationalStatus, type DriverUser } from './useCars'
+import { formatPhoneForDisplay } from '../../shared/utils/phone'
 
 const STATUS_OPTIONS: { value: CarOperationalStatus; label: string }[] = [
   { value: 'available',   label: 'Disponível' },
@@ -11,14 +12,6 @@ const STATUS_OPTIONS: { value: CarOperationalStatus; label: string }[] = [
   { value: 'offline',     label: 'Offline' },
   { value: 'unavailable', label: 'Indisponível' },
 ]
-
-function formatPhone(digits: string): string {
-  const d = digits.replace(/\D/g, '').slice(0, 11)
-  if (d.length <= 2) return d
-  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`
-  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
-  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
-}
 
 interface StatusSelectorProps {
   car: Car
@@ -164,9 +157,9 @@ export function CarsPage() {
                     <td className="px-4 py-3 text-zinc-100">{car.pilot_name}</td>
                     <td className="px-4 py-3 text-zinc-300">{car.copilot_name ?? '—'}</td>
                     <td className="px-4 py-3 text-zinc-300">
-                      <div>{formatPhone(car.pilot_phone)}</div>
+                      <div>{formatPhoneForDisplay(car.pilot_phone)}</div>
                       {car.copilot_phone && (
-                        <div className="text-zinc-500 text-xs">{formatPhone(car.copilot_phone)}</div>
+                        <div className="text-zinc-500 text-xs">{formatPhoneForDisplay(car.copilot_phone)}</div>
                       )}
                     </td>
                     <td className="px-4 py-3">

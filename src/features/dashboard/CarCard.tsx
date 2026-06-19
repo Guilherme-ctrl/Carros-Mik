@@ -1,4 +1,5 @@
 import { CarStatusBadge } from '../cars/CarStatusBadge'
+import { formatPhoneForDisplay } from '../../shared/utils/phone'
 import type { Car } from '../cars/useCars'
 import type { RequestWithLeader } from './useAllRequests'
 
@@ -26,9 +27,9 @@ export function CarCard({ car, selectedRequest, onInitiateAssign }: Props) {
             <span className="text-zinc-500">Copiloto: </span>{car.copilot_name}
           </p>
         )}
-        <p className="text-zinc-500 text-xs">{car.pilot_phone}</p>
+        <p className="text-zinc-500 text-xs">{formatPhoneForDisplay(car.pilot_phone)}</p>
         {car.copilot_phone && (
-          <p className="text-zinc-500 text-xs">{car.copilot_phone}</p>
+          <p className="text-zinc-500 text-xs">{formatPhoneForDisplay(car.copilot_phone)}</p>
         )}
       </div>
       {canAssign && (

@@ -5,6 +5,8 @@ import { RequestTimeline } from './RequestTimeline'
 import { CommentsPanel } from './CommentsPanel'
 import { OutcomeBadge } from './OutcomeBadge'
 import type { Request } from './useRequests'
+import { formatPhoneForDisplay } from '../../shared/utils/phone'
+import { markChatAsRead } from '../notifications/notificationsService'
 
 interface CarInfo {
   pilot_name: string
@@ -49,6 +51,7 @@ export function RequestDetailSidebar({ request, onClose }: Props) {
     setCar(null)
     setLeader(null)
     setTimelineKey((k) => k + 1)
+    markChatAsRead(request.id)
 
     if (request.assigned_car_id) {
       supabase
@@ -119,7 +122,7 @@ export function RequestDetailSidebar({ request, onClose }: Props) {
               </div>
             )}
             {leader && (
-              <_Field label="Líder" value={`${leader.name} · ${leader.phone}`} />
+              <_Field label="Líder" value={`${leader.name} · ${formatPhoneForDisplay(leader.phone)}`} />
             )}
             {car && (
               <_Field label="Carro" value={[car.pilot_name, car.copilot_name].filter(Boolean).join(' / ')} />

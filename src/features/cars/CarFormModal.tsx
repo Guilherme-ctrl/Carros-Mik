@@ -1,15 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Button } from '../../shared/components/ui/Button'
 import { Input } from '../../shared/components/ui/Input'
+import { PhoneInput } from '../../shared/components/PhoneInput'
+import { stripPhonePrefix } from '../../shared/utils/phone'
 import type { Car, DriverUser } from './useCars'
-
-function formatPhone(digits: string): string {
-  const d = digits.replace(/\D/g, '').slice(0, 11)
-  if (d.length <= 2) return d.length ? `(${d}` : ''
-  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`
-  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
-  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
-}
 
 interface Props {
   car?: Car
@@ -31,10 +25,8 @@ export function CarFormModal({ car, driverUsers, onClose, onSubmit }: Props) {
   const [number, setNumber] = useState(car?.number ?? '')
   const [pilotName, setPilotName] = useState(car?.pilot_name ?? '')
   const [copilotName, setCopilotName] = useState(car?.copilot_name ?? '')
-  const [pilotPhoneDisplay, setPilotPhoneDisplay] = useState(car ? formatPhone(car.pilot_phone) : '')
-  const [copilotPhoneDisplay, setCopilotPhoneDisplay] = useState(
-    car?.copilot_phone ? formatPhone(car.copilot_phone) : ''
-  )
+  const [pilotPhone, setPilotPhone] = useState(car?.pilot_phone ?? '')
+  const [copilotPhone, setCopilotPhone] = useState(car?.copilot_phone ?? '')
   const [driverUserId, setDriverUserId] = useState(car?.driver_user_id ?? '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -51,14 +43,12 @@ export function CarFormModal({ car, driverUsers, onClose, onSubmit }: Props) {
     e.preventDefault()
     setError('')
 
-    const pilotPhone = pilotPhoneDisplay.replace(/\D/g, '')
-    if (pilotPhone.length < 10) {
+    if (stripPhonePrefix(pilotPhone).length < 10) {
       setError('Telefone do piloto inválido.')
       return
     }
 
-    const copilotPhone = copilotPhoneDisplay.replace(/\D/g, '')
-    if (copilotPhoneDisplay && copilotPhone.length < 10) {
+    if (copilotPhone && stripPhonePrefix(copilotPhone).length < 10) {
       setError('Telefone do copiloto inválido.')
       return
     }
@@ -121,11 +111,10 @@ export function CarFormModal({ car, driverUsers, onClose, onSubmit }: Props) {
             disabled={loading}
           />
 
-          <Input
+          <PhoneInput
             label="Telefone do piloto"
-            placeholder="(11) 99999-9999"
-            value={pilotPhoneDisplay}
-            onChange={(e) => setPilotPhoneDisplay(formatPhone(e.target.value))}
+            value={pilotPhone}
+            onChange={setPilotPhone}
             required
             disabled={loading}
           />
@@ -138,11 +127,10 @@ export function CarFormModal({ car, driverUsers, onClose, onSubmit }: Props) {
             disabled={loading}
           />
 
-          <Input
+          <PhoneInput
             label="Telefone do copiloto (opcional)"
-            placeholder="(11) 99999-9999"
-            value={copilotPhoneDisplay}
-            onChange={(e) => setCopilotPhoneDisplay(formatPhone(e.target.value))}
+            value={copilotPhone}
+            onChange={setCopilotPhone}
             disabled={loading}
           />
 

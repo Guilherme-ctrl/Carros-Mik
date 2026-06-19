@@ -3,14 +3,7 @@ import { Button } from '../../shared/components/ui/Button'
 import { LeaderFormModal } from './LeaderFormModal'
 import { StatusBadge } from './StatusBadge'
 import { useLeaders, type Leader } from './useLeaders'
-
-function formatPhone(digits: string): string {
-  const d = digits.replace(/\D/g, '').slice(0, 11)
-  if (d.length <= 2) return d
-  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`
-  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
-  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
-}
+import { formatPhoneForDisplay } from '../../shared/utils/phone'
 
 export function LeadersPage() {
   const { leaders, loading, error, getLeaders, createLeader, updateLeader, toggleActive } = useLeaders()
@@ -93,7 +86,7 @@ export function LeadersPage() {
                   <tr key={leader.id} className="border-b border-zinc-800/50 last:border-0 hover:bg-zinc-800/30 transition-colors">
                     <td className="px-4 py-3 text-zinc-100">{leader.name}</td>
                     <td className="px-4 py-3 text-zinc-300">{leader.table_name ?? '—'}</td>
-                    <td className="px-4 py-3 text-zinc-300">{formatPhone(leader.phone)}</td>
+                    <td className="px-4 py-3 text-zinc-300">{formatPhoneForDisplay(leader.phone)}</td>
                     <td className="px-4 py-3">
                       <StatusBadge active={leader.is_active} />
                     </td>

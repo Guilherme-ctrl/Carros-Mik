@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { Button } from '../../shared/components/ui/Button'
 import { Input } from '../../shared/components/ui/Input'
+import { PhoneInput } from '../../shared/components/PhoneInput'
+import { stripPhonePrefix } from '../../shared/utils/phone'
 import type { Leader } from './useLeaders'
 
 interface Props {
@@ -9,35 +11,18 @@ interface Props {
   onSubmit: (params: { name: string; table_name: string | null; phone: string }) => Promise<void>
 }
 
-function formatPhone(digits: string): string {
-  const d = digits.replace(/\D/g, '').slice(0, 11)
-  if (d.length <= 2) return d.length ? `(${d}` : ''
-  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`
-  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
-  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`
-}
-
-function displayPhone(raw: string): string {
-  return formatPhone(raw)
-}
-
 export function LeaderFormModal({ leader, onClose, onSubmit }: Props) {
   const isEdit = !!leader
   const [name, setName] = useState(leader?.name ?? '')
   const [tableName, setTableName] = useState(leader?.table_name ?? '')
-  const [phoneDisplay, setPhoneDisplay] = useState(leader ? displayPhone(leader.phone) : '')
+  const [phone, setPhone] = useState(leader?.phone ?? '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
-  function handlePhoneChange(value: string) {
-    setPhoneDisplay(formatPhone(value))
-  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError('')
-    const phone = phoneDisplay.replace(/\D/g, '')
-    if (phone.length < 10) {
+    if (stripPhonePrefix(phone).length < 10) {
       setError('Telefone inválido.')
       return
     }
@@ -87,11 +72,10 @@ export function LeaderFormModal({ leader, onClose, onSubmit }: Props) {
             disabled={loading}
           />
 
-          <Input
+          <PhoneInput
             label="Telefone"
-            placeholder="(11) 99999-9999"
-            value={phoneDisplay}
-            onChange={(e) => handlePhoneChange(e.target.value)}
+            value={phone}
+            onChange={setPhone}
             required
             disabled={loading}
           />

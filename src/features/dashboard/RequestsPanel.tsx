@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { RequestCard } from './RequestCard'
+import { useUnreadMessageCounts } from '../notifications/useUnreadMessageCounts'
 import type { RequestWithLeader } from './useAllRequests'
 import type { RequestStatus } from '../requests/useRequests'
 
@@ -30,6 +31,7 @@ interface Props {
 
 export function RequestsPanel({ requests, loading, error, selectedId, onSelectRequest, fullWidth, isOpen, onToggle }: Props) {
   const [statusFilter, setStatusFilter] = useState<RequestStatus | 'all'>('all')
+  const unreadCounts = useUnreadMessageCounts()
 
   const activeRequests = requests.filter((r) => ACTIVE_STATUSES.includes(r.status))
   const filteredActive =
@@ -110,6 +112,7 @@ export function RequestsPanel({ requests, loading, error, selectedId, onSelectRe
               request={req}
               isSelected={req.id === selectedId}
               onClick={() => onSelectRequest(req)}
+              unreadCount={unreadCounts[req.id]}
             />
           ))
         )}
@@ -125,6 +128,7 @@ export function RequestsPanel({ requests, loading, error, selectedId, onSelectRe
                 request={req}
                 isSelected={req.id === selectedId}
                 onClick={() => onSelectRequest(req)}
+                unreadCount={unreadCounts[req.id]}
               />
             ))}
           </>
