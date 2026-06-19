@@ -3,6 +3,7 @@ import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { useCars, type Car } from '../cars/useCars'
 import { useAssignCar } from '../assignment/useAssignCar'
+import { useUnreadMessageCounts } from '../notifications/useUnreadMessageCounts'
 import { AssignmentModal } from '../assignment/AssignmentModal'
 import { CarsPanel } from './CarsPanel'
 import { MapPanel } from './MapPanel'
@@ -21,6 +22,7 @@ export function DashboardPage() {
   const { cars, setCars, getCars } = useCars()
   const { requests, setRequests, loading: requestsLoading, error: requestsError, getAllRequests } = useAllRequests()
   const { assignCar, reassignCar, loading: assigning } = useAssignCar()
+  const unreadCounts = useUnreadMessageCounts()
 
   const [selectedRequest, setSelectedRequest] = useState<RequestWithLeader | null>(null)
   const [pendingAssignment, setPendingAssignment] = useState<PendingAssignment | null>(null)
@@ -165,6 +167,7 @@ export function DashboardPage() {
           error={requestsError}
           selectedId={selectedRequest?.id ?? null}
           onSelectRequest={setSelectedRequest}
+          unreadCounts={unreadCounts}
           isOpen={requestsPanelOpen}
           onToggle={() => setRequestsPanelOpen((p) => !p)}
         />
@@ -201,6 +204,7 @@ export function DashboardPage() {
             error={requestsError}
             selectedId={selectedRequest?.id ?? null}
             onSelectRequest={setSelectedRequest}
+            unreadCounts={unreadCounts}
             fullWidth
           />
         )}
