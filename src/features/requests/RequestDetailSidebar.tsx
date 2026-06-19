@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { RequestStatusBadge } from './RequestStatusBadge'
 import { RequestTimeline } from './RequestTimeline'
@@ -7,6 +8,7 @@ import { OutcomeBadge } from './OutcomeBadge'
 import type { Request } from './useRequests'
 import { formatPhoneForDisplay } from '../../shared/utils/phone'
 import { markChatAsRead } from '../notifications/notificationsService'
+import { useUpdateStatus } from './useUpdateStatus'
 
 interface CarInfo {
   pilot_name: string
@@ -36,10 +38,24 @@ interface Props {
   onClose: () => void
 }
 
+const CANCELLABLE = new Set(['open', 'under_review'])
+
 export function RequestDetailSidebar({ request, onClose }: Props) {
   const [car, setCar] = useState<CarInfo | null>(null)
   const [leader, setLeader] = useState<LeaderInfo | null>(null)
   const [timelineKey, setTimelineKey] = useState(0)
+  const { updateStatus, loading: cancelling } = useUpdateStatus()
+
+  async function handleCancel() {
+    if (!request) return
+    try {
+      await updateStatus(request.id, 'cancelled')
+      toast.success('Solicitação cancelada')
+      onClose()
+    } catch {
+      toast.error('Erro ao cancelar solicitação')
+    }
+  }
 
   useEffect(() => {
     if (!request) {
@@ -131,6 +147,19 @@ export function RequestDetailSidebar({ request, onClose }: Props) {
 
           {/* Histórico */}
           <RequestTimeline requestId={request.id} refreshKey={timelineKey} />
+
+          {/* Cancelar */}
+          {CANCELLABLE.has(request.status) && (
+            <div className="pt-2 border-t border-zinc-800">
+              <button
+                onClick={handleCancel}
+                disabled={cancelling}
+                className="w-full rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {cancelling ? 'Cancelando…' : 'Cancelar solicitação'}
+              </button>
+            </div>
+          )}
 
           {/* Comentários */}
           <div className="pt-2 border-t border-zinc-800">
