@@ -19,6 +19,7 @@ export interface RequestWithLeader {
   created_at: string
   updated_at: string
   leaders: { name: string; table_name: string | null; phone: string | null } | null
+  cars: { number: string; pilot_name: string; copilot_name: string | null } | null
 }
 
 export function useAllRequests() {
@@ -32,7 +33,7 @@ export function useAllRequests() {
     try {
       const { data, error: dbError } = await supabase
         .from('requests')
-        .select('*, leaders(name, table_name, phone)')
+        .select('*, leaders(name, table_name, phone), cars(number, pilot_name, copilot_name)')
         .order('created_at', { ascending: true })
       if (dbError) throw new Error(dbError.message)
       setRequests((data ?? []) as RequestWithLeader[])

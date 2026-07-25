@@ -23,13 +23,12 @@ interface Props {
   error: string | null
   selectedId: string | null
   onSelectRequest: (request: RequestWithLeader) => void
-  unreadCounts: Record<string, number>
   fullWidth?: boolean
   isOpen?: boolean
   onToggle?: () => void
 }
 
-export function RequestsPanel({ requests, loading, error, selectedId, onSelectRequest, unreadCounts, fullWidth, isOpen, onToggle }: Props) {
+export function RequestsPanel({ requests, loading, error, selectedId, onSelectRequest, fullWidth, isOpen, onToggle }: Props) {
   const [statusFilter, setStatusFilter] = useState<RequestStatus | 'all'>('all')
 
   const activeRequests = requests.filter((r) => ACTIVE_STATUSES.includes(r.status))
@@ -111,7 +110,6 @@ export function RequestsPanel({ requests, loading, error, selectedId, onSelectRe
               request={req}
               isSelected={req.id === selectedId}
               onClick={() => onSelectRequest(req)}
-              unreadCount={unreadCounts[req.id]}
             />
           ))
         )}
@@ -127,7 +125,6 @@ export function RequestsPanel({ requests, loading, error, selectedId, onSelectRe
                 request={req}
                 isSelected={req.id === selectedId}
                 onClick={() => onSelectRequest(req)}
-                unreadCount={unreadCounts[req.id]}
               />
             ))}
           </>

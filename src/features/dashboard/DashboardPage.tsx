@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { useCars, type Car } from '../cars/useCars'
 import { useAssignCar } from '../assignment/useAssignCar'
-import { useUnreadMessageCounts } from '../notifications/useUnreadMessageCounts'
 import { AssignmentModal } from '../assignment/AssignmentModal'
-import { CarsPanel } from './CarsPanel'
+import { CarsStatusDropdown } from './CarsStatusDropdown'
 import { MapPanel } from './MapPanel'
 import { RequestDetailSidebar } from './RequestDetailSidebar'
 import { RequestsPanel } from './RequestsPanel'
@@ -14,15 +13,15 @@ import { useAllRequests, type RequestWithLeader } from './useAllRequests'
 interface PendingAssignment {
   car: Car
   isReassignment: boolean
+  willReleaseBusyCar: boolean
 }
 
-type ActiveTab = 'requests' | 'cars' | 'map'
+type ActiveTab = 'requests' | 'map'
 
 export function DashboardPage() {
   const { cars, setCars, getCars } = useCars()
   const { requests, setRequests, loading: requestsLoading, error: requestsError, getAllRequests } = useAllRequests()
   const { assignCar, reassignCar, loading: assigning } = useAssignCar()
-  const unreadCounts = useUnreadMessageCounts()
 
   const [selectedRequest, setSelectedRequest] = useState<RequestWithLeader | null>(null)
   const [pendingAssignment, setPendingAssignment] = useState<PendingAssignment | null>(null)
@@ -30,6 +29,12 @@ export function DashboardPage() {
   const [requestsPanelOpen, setRequestsPanelOpen] = useState(true)
 
   const openCount = requests.filter((r) => r.status === 'open').length
+
+  // Realtime UPDATE payloads only carry the requests table's own columns, not
+  // the joined leaders/cars relations — keep a ref to the latest cars list so
+  // the requests-realtime handler can resolve the assigned car client-side.
+  const carsRef = useRef(cars)
+  useEffect(() => { carsRef.current = cars }, [cars])
 
   // Initial data load
   useEffect(() => {
@@ -49,11 +54,27 @@ export function DashboardPage() {
             getAllRequests()
           } else if (payload.eventType === 'UPDATE') {
             const updated = payload.new as RequestWithLeader
+            // payload.new only has the requests table's own columns — the
+            // joined `cars` relation isn't included, so resolve it from the
+            // current cars list to keep the assigned-car display accurate.
+            const resolvedCar = updated.assigned_car_id
+              ? carsRef.current.find((c) => c.id === updated.assigned_car_id) ?? null
+              : null
+            const patch = {
+              ...updated,
+              cars: resolvedCar
+                ? {
+                    number: resolvedCar.number,
+                    pilot_name: resolvedCar.pilot_name,
+                    copilot_name: resolvedCar.copilot_name,
+                  }
+                : null,
+            }
             setRequests((prev) =>
-              prev.map((r) => (r.id === updated.id ? { ...r, ...updated } : r))
+              prev.map((r) => (r.id === patch.id ? { ...r, ...patch } : r))
             )
             setSelectedRequest((prev) =>
-              prev?.id === updated.id ? { ...prev, ...updated } : prev
+              prev?.id === patch.id ? { ...prev, ...patch } : prev
             )
           } else if (payload.eventType === 'DELETE') {
             setRequests((prev) => prev.filter((r) => r.id !== payload.old.id))
@@ -93,7 +114,8 @@ export function DashboardPage() {
   function handleInitiateAssign(car: Car) {
     if (!selectedRequest) return
     const isReassignment = selectedRequest.status === 'car_assigned'
-    setPendingAssignment({ car, isReassignment })
+    const willReleaseBusyCar = car.operational_status === 'on_mission'
+    setPendingAssignment({ car, isReassignment, willReleaseBusyCar })
   }
 
   async function handleConfirmAssignment() {
@@ -128,7 +150,6 @@ export function DashboardPage() {
 
   const TAB_LABELS: Record<ActiveTab, string> = {
     requests: `Solicitações${openCount > 0 ? ` (${openCount})` : ''}`,
-    cars: `Carros (${cars.length})`,
     map: 'Mapa',
   }
 
@@ -144,7 +165,7 @@ export function DashboardPage() {
     <div className="relative flex flex-col flex-1 min-h-0">
       {/* Tab bar — visible only on tablet/mobile (< lg) */}
       <div className="flex lg:hidden border-b border-zinc-800 bg-zinc-950 shrink-0">
-        {(['requests', 'cars', 'map'] as ActiveTab[]).map((tab) => (
+        {(['requests', 'map'] as ActiveTab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -159,13 +180,13 @@ export function DashboardPage() {
         ))}
       </div>
 
-      {/* Desktop: 3-column grid layout */}
+      {/* Desktop: 2-column grid layout */}
       <main
         className="hidden lg:grid flex-1 overflow-hidden min-h-0"
         style={{
           gridTemplateColumns: requestsPanelOpen
-            ? '[requests] 24rem [missions] 20rem [map] 1fr'
-            : '[requests] 0px [missions] 20rem [map] 1fr',
+            ? '[requests] 24rem [map] 1fr'
+            : '[requests] 0px [map] 1fr',
           transition: 'grid-template-columns 250ms ease-in-out',
         }}
       >
@@ -175,15 +196,8 @@ export function DashboardPage() {
           error={requestsError}
           selectedId={selectedRequest?.id ?? null}
           onSelectRequest={setSelectedRequest}
-          unreadCounts={unreadCounts}
           isOpen={requestsPanelOpen}
           onToggle={() => setRequestsPanelOpen((p) => !p)}
-        />
-        <CarsPanel
-          cars={cars}
-          loading={requestsLoading}
-          selectedRequest={selectedRequest}
-          onInitiateAssign={handleInitiateAssign}
         />
         <div className="relative flex-1 min-w-0 flex">
           <MapPanel cars={cars} requests={requests} />
@@ -197,6 +211,7 @@ export function DashboardPage() {
             </svg>
             Abrir em outra tela
           </button>
+          <CarsStatusDropdown cars={cars} />
         </div>
       </main>
 
@@ -224,16 +239,6 @@ export function DashboardPage() {
             error={requestsError}
             selectedId={selectedRequest?.id ?? null}
             onSelectRequest={setSelectedRequest}
-            unreadCounts={unreadCounts}
-            fullWidth
-          />
-        )}
-        {activeTab === 'cars' && (
-          <CarsPanel
-            cars={cars}
-            loading={requestsLoading}
-            selectedRequest={selectedRequest}
-            onInitiateAssign={handleInitiateAssign}
             fullWidth
           />
         )}
@@ -250,6 +255,7 @@ export function DashboardPage() {
               </svg>
               Abrir em outra tela
             </button>
+            <CarsStatusDropdown cars={cars} />
           </div>
         )}
       </main>
@@ -266,6 +272,7 @@ export function DashboardPage() {
           request={selectedRequest}
           car={pendingAssignment.car}
           isReassignment={pendingAssignment.isReassignment}
+          willReleaseBusyCar={pendingAssignment.willReleaseBusyCar}
           loading={assigning}
           onConfirm={handleConfirmAssignment}
           onClose={() => setPendingAssignment(null)}

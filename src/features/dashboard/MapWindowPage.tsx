@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useCars, type Car } from '../cars/useCars'
+import { CarsStatusDropdown } from './CarsStatusDropdown'
 import { MapPanel } from './MapPanel'
 import { useAllRequests, type RequestWithLeader } from './useAllRequests'
 
@@ -64,8 +65,9 @@ export function MapWindowPage() {
   }, [setCars])
 
   return (
-    <div className="flex h-screen w-screen bg-zinc-900">
+    <div className="relative flex h-screen w-screen bg-zinc-900">
       <MapPanel cars={cars} requests={requests} />
+      <CarsStatusDropdown cars={cars} />
     </div>
   )
 }

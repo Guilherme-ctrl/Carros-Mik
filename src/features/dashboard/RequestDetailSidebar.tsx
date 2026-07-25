@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { CarStatusBadge } from '../cars/CarStatusBadge'
 import { RequestStatusBadge } from '../requests/RequestStatusBadge'
 import { StatusTransitionButtons } from '../requests/StatusTransitionButtons'
 import { RequestTimeline } from '../requests/RequestTimeline'
@@ -32,12 +33,7 @@ export function RequestDetailSidebar({ request, cars, onClose, onInitiateAssign 
   // Incremented on each request_history INSERT to trigger RequestTimeline re-fetch
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0)
 
-  const availableCars = cars.filter((c) => c.operational_status === 'available')
   const isAssigned = request?.status === 'car_assigned'
-
-  function handleCarChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setSelectedCarId(e.target.value)
-  }
 
   function handleAssignClick() {
     const car = cars.find((c) => c.id === selectedCarId)
@@ -148,22 +144,15 @@ export function RequestDetailSidebar({ request, cars, onClose, onInitiateAssign 
                 <p className="text-zinc-500 text-xs uppercase tracking-wide">
                   {isAssigned ? 'Reatribuir carro' : 'Atribuir carro'}
                 </p>
-                {availableCars.length === 0 ? (
-                  <p className="text-zinc-600 text-xs">Nenhum carro disponível.</p>
+                {cars.length === 0 ? (
+                  <p className="text-zinc-600 text-xs">Nenhum carro cadastrado.</p>
                 ) : (
                   <>
-                    <select
-                      value={selectedCarId}
-                      onChange={handleCarChange}
-                      className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">Selecionar carro…</option>
-                      {availableCars.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          Carro {c.number} — {c.pilot_name}
-                        </option>
-                      ))}
-                    </select>
+                    <CarPicker
+                      cars={cars}
+                      selectedCarId={selectedCarId}
+                      onSelect={setSelectedCarId}
+                    />
                     <Button
                       size="sm"
                       className="w-full"
@@ -223,5 +212,66 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <dt className="text-zinc-500 text-xs uppercase tracking-wide mb-0.5">{label}</dt>
       <dd className="text-sm leading-relaxed">{children}</dd>
     </dl>
+  )
+}
+
+const CAR_SELECTABLE_STATUSES: Car['operational_status'][] = ['available', 'on_mission']
+
+function CarPicker({
+  cars, selectedCarId, onSelect,
+}: {
+  cars: Car[]
+  selectedCarId: string
+  onSelect: (carId: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const selectedCar = cars.find((c) => c.id === selectedCarId)
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between gap-2 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 hover:border-zinc-600 transition-colors"
+      >
+        <span className={selectedCar ? '' : 'text-zinc-500'}>
+          {selectedCar ? `Carro ${selectedCar.number} — ${selectedCar.pilot_name}` : 'Selecionar carro…'}
+        </span>
+        <svg
+          width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"
+          className={`shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+        >
+          <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute z-10 mt-1 w-full max-h-64 overflow-y-auto bg-zinc-900 border border-zinc-700 rounded-lg shadow-2xl divide-y divide-zinc-800">
+          {cars.map((car) => {
+            const selectable = CAR_SELECTABLE_STATUSES.includes(car.operational_status)
+            return (
+              <button
+                key={car.id}
+                type="button"
+                disabled={!selectable}
+                onClick={() => { onSelect(car.id); setOpen(false) }}
+                className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-left transition-colors ${
+                  selectable
+                    ? 'hover:bg-zinc-800 cursor-pointer'
+                    : 'opacity-40 cursor-not-allowed'
+                }`}
+              >
+                <div className="min-w-0">
+                  <p className="text-zinc-100 text-xs font-semibold truncate">
+                    Carro {car.number} — {car.pilot_name}
+                  </p>
+                </div>
+                <CarStatusBadge status={car.operational_status} />
+              </button>
+            )
+          })}
+        </div>
+      )}
+    </div>
   )
 }

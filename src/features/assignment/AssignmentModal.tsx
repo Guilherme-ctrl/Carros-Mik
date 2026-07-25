@@ -6,24 +6,42 @@ interface Props {
   request: RequestWithLeader
   car: Car
   isReassignment: boolean
+  willReleaseBusyCar: boolean
   loading: boolean
   onConfirm: () => void
   onClose: () => void
 }
 
-export function AssignmentModal({ request, car, isReassignment, loading, onConfirm, onClose }: Props) {
+export function AssignmentModal({
+  request, car, isReassignment, willReleaseBusyCar, loading, onConfirm, onClose,
+}: Props) {
   const leaderLabel = request.leaders?.table_name ?? request.leaders?.name ?? ''
+
+  const title = willReleaseBusyCar
+    ? 'Substituir missão do carro?'
+    : isReassignment ? 'Reatribuir carro?' : 'Atribuir carro?'
+
+  const messages: string[] = []
+  if (willReleaseBusyCar) {
+    messages.push(
+      `Carro ${car.number} está em outra missão. Ao confirmar, a missão atual dele volta para "Aberta" (sem carro).`
+    )
+  }
+  if (isReassignment) {
+    messages.push('O carro anterior desta solicitação será liberado.')
+  }
+  if (messages.length === 0) {
+    messages.push('Confirme a atribuição abaixo.')
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
       <div className="w-full max-w-sm rounded-xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl space-y-5">
         <div className="space-y-1">
-          <h2 className="text-zinc-100 text-base font-semibold">
-            {isReassignment ? 'Reatribuir carro?' : 'Atribuir carro?'}
-          </h2>
-          <p className="text-zinc-400 text-sm">
-            {isReassignment ? 'O carro anterior será liberado.' : 'Confirme a atribuição abaixo.'}
-          </p>
+          <h2 className="text-zinc-100 text-base font-semibold">{title}</h2>
+          {messages.map((msg) => (
+            <p key={msg} className="text-zinc-400 text-sm">{msg}</p>
+          ))}
         </div>
 
         <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 space-y-3">
@@ -50,7 +68,7 @@ export function AssignmentModal({ request, car, isReassignment, loading, onConfi
             loading={loading}
             className="flex-1"
           >
-            {isReassignment ? 'Reatribuir' : 'Confirmar'}
+            {willReleaseBusyCar ? 'Substituir' : isReassignment ? 'Reatribuir' : 'Confirmar'}
           </Button>
         </div>
       </div>
