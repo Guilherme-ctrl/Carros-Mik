@@ -7,6 +7,7 @@ import { useAuth } from './features/auth/useAuth'
 import { useNotifications } from './features/notifications/useNotifications'
 import { CarsPage } from './features/cars/CarsPage'
 import { DashboardPage } from './features/dashboard/DashboardPage'
+import { MapWindowPage } from './features/dashboard/MapWindowPage'
 import { LeadersPage } from './features/leaders/LeadersPage'
 import { KanbanPage } from './features/requests/KanbanPage'
 import { NewRequestPage } from './features/requests/NewRequestPage'
@@ -61,6 +62,10 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<ProtectedRoute><RoleRoute /></ProtectedRoute>} />
+          <Route
+            path="/dashboard/map-window"
+            element={<ProtectedRoute><DashboardRoute><ErrorBoundary><MapWindowPage /></ErrorBoundary></DashboardRoute></ProtectedRoute>}
+          />
           <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route path="/dashboard" element={<DashboardRoute><ErrorBoundary><DashboardPage /></ErrorBoundary></DashboardRoute>} />
             <Route path="/requests" element={<ErrorBoundary><KanbanPage /></ErrorBoundary>} />

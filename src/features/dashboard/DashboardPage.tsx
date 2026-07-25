@@ -132,6 +132,14 @@ export function DashboardPage() {
     map: 'Mapa',
   }
 
+  function handleOpenMapWindow() {
+    window.open(
+      '/dashboard/map-window',
+      'mik-dundee-mapa',
+      'width=1000,height=800,noopener,noreferrer'
+    )
+  }
+
   return (
     <div className="relative flex flex-col flex-1 min-h-0">
       {/* Tab bar — visible only on tablet/mobile (< lg) */}
@@ -177,7 +185,19 @@ export function DashboardPage() {
           selectedRequest={selectedRequest}
           onInitiateAssign={handleInitiateAssign}
         />
-        <MapPanel cars={cars} requests={requests} />
+        <div className="relative flex-1 min-w-0 flex">
+          <MapPanel cars={cars} requests={requests} />
+          <button
+            onClick={handleOpenMapWindow}
+            title="Abrir mapa em outra tela"
+            className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-zinc-900/90 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 hover:text-zinc-100 hover:bg-zinc-800 transition-colors shadow-lg"
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M6 2H2v12h12v-4M9 2h5v5M14 2L7 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Abrir em outra tela
+          </button>
+        </div>
       </main>
 
       {/* Floating restore button — desktop only, shown when panel is minimised */}
@@ -217,7 +237,21 @@ export function DashboardPage() {
             fullWidth
           />
         )}
-        {activeTab === 'map' && <MapPanel cars={cars} requests={requests} />}
+        {activeTab === 'map' && (
+          <div className="relative flex-1 min-w-0 flex">
+            <MapPanel cars={cars} requests={requests} />
+            <button
+              onClick={handleOpenMapWindow}
+              title="Abrir mapa em outra tela"
+              className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-zinc-900/90 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 hover:text-zinc-100 hover:bg-zinc-800 transition-colors shadow-lg"
+            >
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M6 2H2v12h12v-4M9 2h5v5M14 2L7 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Abrir em outra tela
+            </button>
+          </div>
+        )}
       </main>
 
       <RequestDetailSidebar
