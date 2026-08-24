@@ -1,5 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster, ToastBar } from 'react-hot-toast'
 import { CreateUserPage } from './features/admin/CreateUserPage'
 import { AuthProvider } from './features/auth/AuthProvider'
 import { LoginPage } from './features/auth/LoginPage'
@@ -56,9 +56,23 @@ export default function App() {
               fontSize: '14px',
             },
             success: { iconTheme: { primary: '#22C55E', secondary: '#0D0D18' }, duration: 3000 },
-            error:   { iconTheme: { primary: '#EF4444', secondary: '#0D0D18' }, duration: Infinity },
+            // Erro ficava com duration: Infinity — nunca sumia sozinho e não
+            // havia como fechar, então os avisos empilhavam e cobriam a tela
+            // até dar F5. A intenção original (erro não pode passar despercebido)
+            // continua atendida com 10s, que é bem mais que os 3s do sucesso, e
+            // agora dá para dispensar clicando (ver o render prop abaixo).
+            error:   { iconTheme: { primary: '#EF4444', secondary: '#0D0D18' }, duration: 10000 },
           }}
-        />
+        >
+          {/* Clicar dispensa. Sem isto o operador fica refém do relógio do
+              toast, e no meio da gincana um aviso parado em cima do mapa
+              atrapalha mais do que informa. */}
+          {(t) => (
+            <div onClick={() => toast.dismiss(t.id)} style={{ cursor: 'pointer' }}>
+              <ToastBar toast={t} />
+            </div>
+          )}
+        </Toaster>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<ProtectedRoute><RoleRoute /></ProtectedRoute>} />
