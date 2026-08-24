@@ -143,11 +143,18 @@ export function NewRequestPage() {
             </div>
 
             <AddressAutocompleteInput
-              onSelect={({ street: s, neighborhood: n }) => {
+              onSelect={({ street: s, neighborhood: n, houseNumber }) => {
                 setStreet(s)
                 setNeighborhood(n)
                 clearError('street')
                 clearError('neighborhood')
+                // Só quando vier: o Nominatim devolve número apenas se o líder
+                // digitou junto. Sobrescrever com vazio apagaria um número que
+                // ele já tivesse preenchido à mão.
+                if (houseNumber) {
+                  setStreetNumber(houseNumber)
+                  clearError('streetNumber')
+                }
               }}
               disabled={loading}
             />
