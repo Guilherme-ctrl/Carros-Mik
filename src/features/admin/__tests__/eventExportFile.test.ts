@@ -92,7 +92,8 @@ describe('geração do arquivo .xlsx', () => {
       leaders: [{ name: 'Ana', phone: '4790000001', table_name: 'Mesa 3' }],
       requests: [{
         id: 'r1', event: 'Buscar Cachorro', stage: '1', street: 'Rua XV',
-        street_number: '100', neighborhood: 'Centro', objective: 'Busca',
+        street_number: '100', neighborhood: 'Centro',
+        city: 'Blumenau', objective: 'Busca',
         notes: null, status: 'car_assigned', outcome: null,
         created_at: '2026-08-24T13:00:00Z', updated_at: '2026-08-24T13:30:00Z',
         leaders: { name: 'Ana', phone: '4790000001', table_name: 'Mesa 3' },

@@ -73,6 +73,7 @@ interface RawRequest {
   street: string
   street_number: string
   neighborhood: string
+  city: string | null
   objective: string
   notes: string | null
   status: string
@@ -99,7 +100,7 @@ export async function fetchEventSnapshot(): Promise<EventSnapshot> {
     supabase
       .from('requests')
       .select(`id, event, stage, street, street_number, neighborhood, objective, notes,
-               status, outcome, created_at, updated_at,
+               city, status, outcome, created_at, updated_at,
                leaders(name, phone, table_name),
                request_cars(car_id, status, outcome, is_current, removed_at,
                             cars(id, number, pilot_name, pilot_phone, copilot_name, copilot_phone, operational_status))`)
@@ -149,7 +150,7 @@ function activeCars(r: RawRequest): RawRequestCar[] {
 function missionRows(snap: EventSnapshot, requests: RawRequest[]): Row[] {
   const rows: Row[] = [header([
     'Status', 'Prioridade', 'Evento', 'Etapa', 'Objetivo',
-    'Endereço', 'Bairro', 'Líder', 'Mesa', 'Tel. Líder',
+    'Endereço', 'Bairro', 'Cidade', 'Líder', 'Mesa', 'Tel. Líder',
     'Carros', 'Pilotos', 'Tel. Pilotos', 'Desfecho por carro',
     'Desfecho final', 'Aberta em', 'Atualizada em', 'Observações',
   ])]
@@ -164,6 +165,10 @@ function missionRows(snap: EventSnapshot, requests: RawRequest[]): Row[] {
       { value: r.objective },
       { value: `${r.street}, ${r.street_number}` },
       { value: r.neighborhood },
+      // Em contingência a cidade deixa de ser detalhe: a gincana cobre Gaspar,
+      // Indaial, Timbó e Pomerode, e um endereço sem cidade no papel manda o
+      // carro para a rua homônima errada.
+      { value: r.city ?? 'Blumenau' },
       { value: r.leaders?.name ?? '' },
       { value: r.leaders?.table_name ?? '' },
       { value: r.leaders?.phone ?? '' },

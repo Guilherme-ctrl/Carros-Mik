@@ -18,6 +18,12 @@ export function NewRequestPage() {
   const [street, setStreet] = useState('')
   const [streetNumber, setStreetNumber] = useState('')
   const [neighborhood, setNeighborhood] = useState('')
+  // Blumenau como ponto de partida porque é onde a maior parte acontece — mas
+  // agora é um campo, não uma suposição enterrada no código do app.
+  const [city, setCity] = useState('Blumenau')
+  // Preenchidas só quando o endereço vem da busca. Digitação manual fica sem, e
+  // aí o texto (agora com a cidade certa) volta a ser o que manda.
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [objective, setObjective] = useState('')
   const [mapsLink, setMapsLink] = useState('')
   const [notes, setNotes] = useState('')
@@ -47,6 +53,7 @@ export function NewRequestPage() {
     if (!street.trim()) e.street = 'Campo obrigatório'
     if (!streetNumber.trim()) e.streetNumber = 'Campo obrigatório'
     if (!neighborhood.trim()) e.neighborhood = 'Campo obrigatório'
+    if (!city.trim()) e.city = 'Campo obrigatório'
     if (!objective.trim()) e.objective = 'Campo obrigatório'
     return e
   }
@@ -68,6 +75,9 @@ export function NewRequestPage() {
         street: street.trim(),
         street_number: streetNumber.trim(),
         neighborhood: neighborhood.trim(),
+        city: city.trim(),
+        latitude: coords?.lat ?? null,
+        longitude: coords?.lng ?? null,
         objective: objective.trim(),
         maps_link: mapsLink.trim() || null,
         notes: notes.trim() || null,
@@ -143,11 +153,17 @@ export function NewRequestPage() {
             </div>
 
             <AddressAutocompleteInput
-              onSelect={({ street: s, neighborhood: n, houseNumber }) => {
+              onSelect={({ street: s, neighborhood: n, city: c, latitude, longitude, houseNumber }) => {
                 setStreet(s)
                 setNeighborhood(n)
                 clearError('street')
                 clearError('neighborhood')
+                if (c) { setCity(c); clearError('city') }
+                setCoords(
+                  latitude !== null && longitude !== null
+                    ? { lat: latitude, lng: longitude }
+                    : null,
+                )
                 // Só quando vier: o Nominatim devolve número apenas se o líder
                 // digitou junto. Sobrescrever com vazio apagaria um número que
                 // ele já tivesse preenchido à mão.
@@ -159,8 +175,10 @@ export function NewRequestPage() {
               disabled={loading}
             />
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div className="col-span-1 sm:col-span-2">
+            {/* No celular a Rua ocupa a linha inteira: antes dividia a largura
+                com o Número, e nome de rua não cabe em meia tela. */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="sm:col-span-2">
                 <Input
                   label="Rua"
                   placeholder="Nome da rua"
@@ -173,6 +191,9 @@ export function NewRequestPage() {
               <Input
                 label="Número"
                 placeholder="Ex: 100"
+                // Abre o teclado numérico no celular. `type="number"` não serve:
+                // engole entradas legítimas como "100A" e "s/n".
+                inputMode="numeric"
                 value={streetNumber}
                 onChange={(e) => { setStreetNumber(e.target.value); clearError('streetNumber') }}
                 error={errors.streetNumber}
@@ -180,14 +201,24 @@ export function NewRequestPage() {
               />
             </div>
 
-            <Input
-              label="Bairro"
-              placeholder="Nome do bairro"
-              value={neighborhood}
-              onChange={(e) => { setNeighborhood(e.target.value); clearError('neighborhood') }}
-              error={errors.neighborhood}
-              disabled={loading}
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Bairro"
+                placeholder="Nome do bairro"
+                value={neighborhood}
+                onChange={(e) => { setNeighborhood(e.target.value); clearError('neighborhood') }}
+                error={errors.neighborhood}
+                disabled={loading}
+              />
+              <Input
+                label="Cidade"
+                placeholder="Ex: Blumenau"
+                value={city}
+                onChange={(e) => { setCity(e.target.value); clearError('city') }}
+                error={errors.city}
+                disabled={loading}
+              />
+            </div>
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="objective" className="text-sm font-medium text-zinc-300">
@@ -205,13 +236,27 @@ export function NewRequestPage() {
               {errors.objective && <p className="text-xs text-red-400">{errors.objective}</p>}
             </div>
 
-            <Input
-              label="Link Maps (opcional)"
-              placeholder="https://maps.google.com/..."
-              value={mapsLink}
-              onChange={(e) => setMapsLink(e.target.value)}
-              disabled={loading}
-            />
+            {/* Só quando a busca NÃO deu coordenada.
+                Preencher isto no celular é sair do navegador, abrir o Maps,
+                achar o lugar, compartilhar, copiar, voltar e colar — o passo
+                mais caro do formulário. Ele existia para dar precisão ao
+                motorista, e agora a coordenada da busca dá isso de graça. Some
+                do caminho comum, mas continua sendo a saída de emergência de
+                quem digitou o endereço à mão. */}
+            {coords ? (
+              <p className="text-xs text-green-400">
+                ✓ Local exato capturado da busca — o motorista vai navegar direto
+                para cá.
+              </p>
+            ) : (
+              <Input
+                label="Link Maps (opcional)"
+                placeholder="https://maps.google.com/..."
+                value={mapsLink}
+                onChange={(e) => setMapsLink(e.target.value)}
+                disabled={loading}
+              />
+            )}
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="notes" className="text-sm font-medium text-zinc-300">

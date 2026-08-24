@@ -21,6 +21,14 @@ export interface Request {
   street: string
   street_number: string
   neighborhood: string
+  // Passou a ser guardada (20260824000006): o app montava o destino com
+  // "Blumenau" fixo no código e mandava quem estava em Gaspar para a rua
+  // homônima de Blumenau.
+  city: string
+  // Só quando o endereço veio da busca; digitação manual fica sem, e aí o
+  // texto é o que manda.
+  latitude: number | null
+  longitude: number | null
   objective: string
   maps_link: string | null
   notes: string | null
@@ -80,6 +88,9 @@ export function useRequests() {
     street: string
     street_number: string
     neighborhood: string
+    city: string
+    latitude?: number | null
+    longitude?: number | null
     objective: string
     maps_link?: string | null
     notes?: string | null

@@ -12,18 +12,31 @@ interface NominatimAddress {
   city?: string
   town?: string
   village?: string
+  municipality?: string
   state?: string
 }
 
 interface NominatimResult {
   place_id: number
   display_name: string
+  // Vêm como string na resposta do Nominatim, não como número.
+  lat: string
+  lon: string
   address: NominatimAddress
 }
 
 interface AddressData {
   street: string
   neighborhood: string
+  // A cidade não era capturada, e o app de navegação assumia "Blumenau" fixo:
+  // escolher um endereço em Gaspar mandava o motorista para a rua homônima de
+  // Blumenau.
+  city: string
+  // Já vêm na resposta da busca e eram descartadas. Com elas o motorista navega
+  // por ponto exato em vez de texto, e o dashboard deixa de pagar uma
+  // geocodificação do Google por endereço a cada recarga de página.
+  latitude: number | null
+  longitude: number | null
   // Presente só quando o líder digita o número junto ("Rua XV 100"). O
   // Nominatim não inventa número, então na maior parte das buscas isto vem
   // vazio e o campo Número segue sendo preenchido à mão — foi por isso que os
@@ -155,7 +168,22 @@ export function AddressAutocompleteInput({ onSelect, error, disabled }: Props) {
     const street = address.road ?? ''
     const neighborhood =
       address.suburb ?? address.neighbourhood ?? address.quarter ?? address.city_district ?? ''
-    onSelect({ street, neighborhood, houseNumber: address.house_number })
+    const city = address.city ?? address.town ?? address.village ?? address.municipality ?? ''
+
+    // Number('') é 0, que é uma coordenada válida no golfo da Guiné — daí o
+    // teste explícito de finitude antes de aceitar.
+    const lat = Number(result.lat)
+    const lon = Number(result.lon)
+    const temCoords = Number.isFinite(lat) && Number.isFinite(lon) && !(lat === 0 && lon === 0)
+
+    onSelect({
+      street,
+      neighborhood,
+      city,
+      latitude:  temCoords ? lat : null,
+      longitude: temCoords ? lon : null,
+      houseNumber: address.house_number,
+    })
     setQuery(shortLabel(result))
     setOpen(false)
     setFocusedIndex(-1)

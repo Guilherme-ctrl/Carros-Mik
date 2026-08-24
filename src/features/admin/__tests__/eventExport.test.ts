@@ -25,6 +25,7 @@ function snapshot(): EventSnapshot {
       {
         id: 'req-ativa', event: 'Buscar Cachorro', stage: '1',
         street: 'Rua XV', street_number: '100', neighborhood: 'Centro',
+        city: 'Gaspar',
         objective: 'Busca cachorro', notes: 'Portão azul',
         status: 'car_assigned', outcome: null,
         created_at: '2026-08-24T13:00:00Z', updated_at: '2026-08-24T13:30:00Z',
@@ -39,6 +40,7 @@ function snapshot(): EventSnapshot {
       {
         id: 'req-fim', event: 'Levar Bandeira', stage: '2',
         street: 'Rua 7', street_number: '9', neighborhood: 'Vorstadt',
+        city: 'Blumenau',
         objective: 'Entrega', notes: null,
         status: 'completed', outcome: 'not_found',
         created_at: '2026-08-24T10:00:00Z', updated_at: '2026-08-24T11:00:00Z',
@@ -101,6 +103,15 @@ describe('buildSheets', () => {
     const ativas = buildSheets(snapshot()).find((s) => s.name === 'Missões ativas')!
     const idx = ativas.rows[0].findIndex((c) => c.value === 'Desfecho por carro')
     expect(ativas.rows[1][idx].value).toBe('01: Achei · 02: pendente')
+  })
+
+  // A gincana cobre Gaspar, Indaial, Timbó e Pomerode. Sem cidade no papel, o
+  // endereço em contingência manda o carro para a rua homônima errada.
+  it('leva a cidade para a aba de missões', () => {
+    const ativas = buildSheets(snapshot()).find((s) => s.name === 'Missões ativas')!
+    const idx = ativas.rows[0].findIndex((c) => c.value === 'Cidade')
+    expect(idx).toBeGreaterThan(-1)
+    expect(ativas.rows[1][idx].value).toBe('Gaspar')
   })
 
   it('leva telefone de piloto e de líder para a aba de missões', () => {

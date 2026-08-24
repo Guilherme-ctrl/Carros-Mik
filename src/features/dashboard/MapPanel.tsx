@@ -76,14 +76,37 @@ function MapContent({
     [requests]
   )
 
-  // Geocode destination address for each active request (cached per request ID)
+  // Posição do destino de cada solicitação ativa.
+  //
+  // A coordenada guardada na solicitação (20260824000006) vem da busca de
+  // endereço e é usada direto: é o ponto que o líder escolheu, não uma
+  // interpretação do texto. Só quem não tem cai na geocodificação do Google —
+  // que é paga, assíncrona e com cache apenas em memória, refeita a cada
+  // recarga de página.
   useEffect(() => {
     if (activeRequests.length === 0) return
+
+    const semCoordenada = activeRequests.filter((req) => {
+      if (req.latitude !== null && req.longitude !== null) {
+        if (!(req.id in geocacheRef.current)) {
+          const coords = { lat: req.latitude, lng: req.longitude }
+          geocacheRef.current[req.id] = coords
+          setDestinations((prev) => ({ ...prev, [req.id]: coords }))
+        }
+        return false
+      }
+      return true
+    })
+
+    if (semCoordenada.length === 0) return
+
     const geocoder = new window.google.maps.Geocoder()
-    activeRequests.forEach((req) => {
+    semCoordenada.forEach((req) => {
       if (req.id in geocacheRef.current) return
       geocacheRef.current[req.id] = null
-      const address = `${req.street}, ${req.street_number}, ${req.neighborhood}, Blumenau, SC, Brasil`
+      // A cidade vem da solicitação. Estava fixa em "Blumenau", o que colocava
+      // no mapa um endereço de Gaspar na rua homônima de Blumenau.
+      const address = `${req.street}, ${req.street_number}, ${req.neighborhood}, ${req.city ?? 'Blumenau'}, SC, Brasil`
       geocoder.geocode({ address }, (results, status) => {
         if (status === 'OK' && results?.[0]) {
           const loc = results[0].geometry.location

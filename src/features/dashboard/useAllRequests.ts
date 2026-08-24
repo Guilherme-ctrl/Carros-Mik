@@ -26,6 +26,12 @@ export interface RequestWithLeader {
   street: string
   street_number: string
   neighborhood: string
+  // 20260824000006. `city` substitui o "Blumenau" que estava fixo no código de
+  // navegação e de geocodificação; as coordenadas vêm da busca de endereço e
+  // são nulas quando o líder digitou à mão.
+  city: string | null
+  latitude: number | null
+  longitude: number | null
   objective: string
   maps_link: string | null
   notes: string | null
@@ -46,6 +52,9 @@ export interface RawRequestRow {
   street: string
   street_number: string
   neighborhood: string
+  city: string | null
+  latitude: number | null
+  longitude: number | null
   objective: string
   maps_link: string | null
   notes: string | null
