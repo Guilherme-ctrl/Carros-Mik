@@ -1,5 +1,8 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../features/auth/useAuth'
+import { useEventExport } from '../../features/admin/useEventExport'
+
+const CENTRAL_ROLES = new Set(['central_admin', 'central_operator'])
 
 const NAV = [
   { to: '/dashboard', label: 'Dashboard', roles: ['central_admin', 'central_operator'] },
@@ -13,6 +16,7 @@ export function Sidebar() {
   const { pathname } = useLocation()
   const role = useAuth((s) => s.role)
   const signOut = useAuth((s) => s.signOut)
+  const { exportEvent, loading: exporting } = useEventExport()
 
   const visible = NAV.filter((item) => !item.roles || item.roles.includes(role ?? ''))
 
@@ -41,6 +45,23 @@ export function Sidebar() {
           )
         })}
       </nav>
+
+      {/* Fica na barra lateral, e não escondido dentro de uma página de admin,
+          porque o momento de usar é o pior momento possível para procurar: o
+          sistema instável, e a planilha precisando ser baixada ANTES de cair.
+          Um clique, de qualquer tela. */}
+      {CENTRAL_ROLES.has(role ?? '') && (
+        <div className="p-2 border-t border-zinc-800">
+          <button
+            onClick={exportEvent}
+            disabled={exporting}
+            title="Baixa uma planilha com missões, fila, carros, líderes e mensagens"
+            className="w-full text-left px-3 py-2 text-sm text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 rounded-lg transition-colors disabled:opacity-50"
+          >
+            {exporting ? 'Exportando…' : 'Baixar planilha'}
+          </button>
+        </div>
+      )}
 
       <div className="p-2 border-t border-zinc-800">
         <button
