@@ -9,6 +9,7 @@ const NAV = [
   { to: '/requests', label: 'Solicitações', roles: ['central_admin', 'central_operator', 'table_leader'] },
   { to: '/admin/leaders', label: 'Líderes', roles: ['central_admin', 'central_operator'] },
   { to: '/admin/cars', label: 'Carros', roles: ['central_admin', 'central_operator'] },
+  { to: '/admin/chat', label: 'Chat dos Carros', roles: ['central_admin'] },
   { to: '/admin/users', label: 'Usuários', roles: ['central_admin'] },
 ]
 

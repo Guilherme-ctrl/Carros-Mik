@@ -6,6 +6,7 @@ import { LoginPage } from './features/auth/LoginPage'
 import { useAuth } from './features/auth/useAuth'
 import { useNotifications } from './features/notifications/useNotifications'
 import { CarsPage } from './features/cars/CarsPage'
+import { CarChatPage } from './features/carchat/CarChatPage'
 import { DashboardPage } from './features/dashboard/DashboardPage'
 import { MapWindowPage } from './features/dashboard/MapWindowPage'
 import { LeadersPage } from './features/leaders/LeadersPage'
@@ -89,6 +90,10 @@ export default function App() {
             <Route path="/admin/users" element={<AdminRoute><ErrorBoundary><UsersPage /></ErrorBoundary></AdminRoute>} />
             <Route path="/admin/leaders" element={<CentralRoute><ErrorBoundary><LeadersPage /></ErrorBoundary></CentralRoute>} />
             <Route path="/admin/cars" element={<CentralRoute><ErrorBoundary><CarsPage /></ErrorBoundary></CentralRoute>} />
+            {/* AdminRoute, não CentralRoute: o canal é do gestor. O sigilo de
+                verdade está na RLS de car_messages — a rota só evita mostrar
+                uma tela que viria vazia. */}
+            <Route path="/admin/chat" element={<AdminRoute><ErrorBoundary><CarChatPage /></ErrorBoundary></AdminRoute>} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

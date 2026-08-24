@@ -80,6 +80,15 @@ export function useNotifications() {
             return
           }
 
+          // Canal privado do gestor (20260824000005). Mesmo tratamento da
+          // mensagem de missão: quem está com o mapa aberto precisa ouvir.
+          if (n.type === 'car_message') {
+            toast(`${n.title}: ${n.body}`, { duration: 8000, icon: '🚗' })
+            playMessageChime()
+            notifyOutsideTab(n.title, n.body, 'car-chat')
+            return
+          }
+
           if (n.type === 'comment_added') {
             toast(n.body, { duration: 8000, icon: '💬' })
             // Som SEMPRE, inclusive com a aba em foco: o operador está olhando
