@@ -3,6 +3,7 @@ import toast from 'react-hot-toast'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../auth/useAuth'
+import { playMessageChime } from './notificationSound'
 
 // Assina a tabela notifications do usuário atual via Realtime.
 //
@@ -81,6 +82,10 @@ export function useNotifications() {
 
           if (n.type === 'comment_added') {
             toast(n.body, { duration: 8000, icon: '💬' })
+            // Som SEMPRE, inclusive com a aba em foco: o operador está olhando
+            // o mapa, não o canto onde o toast aparece. É justamente o caso em
+            // que o aviso visual passa batido.
+            playMessageChime()
             notifyOutsideTab(n.title, n.body, `chat-${n.request_id ?? 'geral'}`)
           }
         },

@@ -21,6 +21,24 @@ export function KanbanPage() {
   const userIdRef = useRef<string | null>(null)
   const unreadCounts = useUnreadMessageCounts()
 
+  // Mantém o painel lateral apontando para a linha mais fresca.
+  //
+  // Sem isto, `selectedRequest` era capturado no clique do card e nunca mais
+  // atualizado: a LISTA reagia ao Realtime, o painel aberto não. Quando o
+  // motorista encerrava a missão pelo app, quem estava com ela aberta aqui
+  // continuava vendo "Designada" e o botão de encerrar, e nunca via o de
+  // reabrir — parecia que a web não tinha percebido. O DashboardPage já fazia
+  // esta sincronia; o Kanban ficou de fora.
+  const selectedIdRef = useRef<string | null>(null)
+  useEffect(() => { selectedIdRef.current = selectedRequest?.id ?? null }, [selectedRequest])
+  useEffect(() => {
+    if (!selectedIdRef.current) return
+    const fresh = requests.find((r) => r.id === selectedIdRef.current)
+    // Só troca se mudou de verdade: setState com o MESMO objeto ainda
+    // re-renderiza o painel a cada tick de Realtime da lista.
+    if (fresh && fresh !== selectedRequest) setSelectedRequest(fresh)
+  }, [requests, selectedRequest])
+
   useEffect(() => {
     if (isCentral) {
       getAllRequests()
