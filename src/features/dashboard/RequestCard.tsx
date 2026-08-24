@@ -1,4 +1,5 @@
 import { RequestStatusBadge } from '../requests/RequestStatusBadge'
+import { isAwaitingClosure } from '../requests/awaitingClosure'
 import type { RequestWithLeader } from './useAllRequests'
 
 function elapsedLabel(isoString: string): string {
@@ -37,6 +38,14 @@ export function RequestCard({ request, isSelected, onClick }: Props) {
       </div>
       <div className="flex items-center gap-2">
         <RequestStatusBadge status={request.status} />
+        {isAwaitingClosure(request.status, request.cars) && (
+          <span
+            className="shrink-0 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-400"
+            title="Todos os carros já reportaram. A missão segue aberta e segurando os carros até alguém encerrar."
+          >
+            Encerrar
+          </span>
+        )}
         <span className="text-zinc-400 text-xs truncate">
           {leaderName}{leaderTable ? ` · ${leaderTable}` : ''}
         </span>
@@ -44,11 +53,10 @@ export function RequestCard({ request, isSelected, onClick }: Props) {
       <p className="text-zinc-500 text-xs truncate">
         {request.street}, {request.street_number} — {request.neighborhood}
       </p>
-      {request.cars && (
+      {request.cars.length > 0 && (
         <p className="text-zinc-400 text-xs truncate">
-          <span className="text-zinc-500">Carro </span>
-          {request.cars.number} — {request.cars.pilot_name}
-          {request.cars.copilot_name ? ` / ${request.cars.copilot_name}` : ''}
+          <span className="text-zinc-500">{request.cars.length > 1 ? 'Carros ' : 'Carro '}</span>
+          {request.cars.map((c) => `${c.number}`).join(', ')}
         </p>
       )}
     </button>

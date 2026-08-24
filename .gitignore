@@ -23,3 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Resíduo: scratch do AI-DLC que vazou para dentro deste pacote. O workspace de
+# verdade fica na raiz do monorepo.
+aidlc/

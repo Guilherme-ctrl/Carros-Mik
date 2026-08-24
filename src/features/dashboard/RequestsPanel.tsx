@@ -3,18 +3,16 @@ import { RequestCard } from './RequestCard'
 import type { RequestWithLeader } from './useAllRequests'
 import type { RequestStatus } from '../requests/useRequests'
 
-const ACTIVE_STATUSES: RequestStatus[] = [
-  'open', 'under_review', 'car_assigned', 'on_the_way', 'on_site', 'returning',
-]
+// U1 (ADR-3) narrowed RequestStatus — car_assigned now covers the whole
+// "has 1+ cars, not yet closed" window regardless of any individual car's
+// own progress (request_cars.status carries that now, per-car, FR7).
+const ACTIVE_STATUSES: RequestStatus[] = ['open', 'under_review', 'car_assigned']
 const HISTORY_STATUSES: RequestStatus[] = ['completed', 'cancelled']
 
 const STATUS_LABELS: Partial<Record<RequestStatus, string>> = {
   open: 'Aberta',
   under_review: 'Em análise',
   car_assigned: 'Designado',
-  on_the_way: 'A caminho',
-  on_site: 'No local',
-  returning: 'Retornando',
 }
 
 interface Props {

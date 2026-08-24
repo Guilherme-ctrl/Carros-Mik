@@ -2,26 +2,34 @@ import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { useCars, type Car } from '../cars/useCars'
-import { useAssignCar } from '../assignment/useAssignCar'
+import { useAssignCar, type AssignMode } from '../assignment/useAssignCar'
 import { AssignmentModal } from '../assignment/AssignmentModal'
 import { CarsStatusDropdown } from './CarsStatusDropdown'
 import { MapPanel } from './MapPanel'
-import { RequestDetailSidebar } from './RequestDetailSidebar'
+import { DashboardRequestSidebar } from './DashboardRequestSidebar'
 import { RequestsPanel } from './RequestsPanel'
 import { useAllRequests, type RequestWithLeader } from './useAllRequests'
+import { useFleetQueue } from './useFleetQueue'
 
+// FR1.3 — a pending bulk assignment, plus the busy-car conflict (if any) the
+// RPC reported for one of the selected cars. `carIds` is the full original
+// selection, so a confirmed transfer can re-submit the whole batch (ADR-12 —
+// the batch RPC is all-or-nothing, so a partial retry isn't a thing).
 interface PendingAssignment {
-  car: Car
-  isReassignment: boolean
-  willReleaseBusyCar: boolean
+  carIds: string[]
+  conflict: { car: Car; conflictingRequestId: string } | null
 }
 
 type ActiveTab = 'requests' | 'map'
 
 export function DashboardPage() {
   const { cars, setCars, getCars } = useCars()
-  const { requests, setRequests, loading: requestsLoading, error: requestsError, getAllRequests } = useAllRequests()
-  const { assignCar, reassignCar, loading: assigning } = useAssignCar()
+  const { requests, loading: requestsLoading, error: requestsError, getAllRequests } = useAllRequests()
+  const { addCars, addCar, confirmTransfer, removeCar, loading: assigning } = useAssignCar()
+  // Selector form on purpose: this page only needs to TRIGGER the fleet-queue
+  // refetch (the queue UI itself lives in CarsStatusDropdown, which reads the
+  // same shared store), so it must not re-render on every queue state change.
+  const getFleetQueueOverview = useFleetQueue((s) => s.getOverview)
 
   const [selectedRequest, setSelectedRequest] = useState<RequestWithLeader | null>(null)
   const [pendingAssignment, setPendingAssignment] = useState<PendingAssignment | null>(null)
@@ -30,11 +38,14 @@ export function DashboardPage() {
 
   const openCount = requests.filter((r) => r.status === 'open').length
 
-  // Realtime UPDATE payloads only carry the requests table's own columns, not
-  // the joined leaders/cars relations — keep a ref to the latest cars list so
-  // the requests-realtime handler can resolve the assigned car client-side.
-  const carsRef = useRef(cars)
-  useEffect(() => { carsRef.current = cars }, [cars])
+  // Keep selectedRequest pointing at the freshest row after any refetch.
+  const selectedIdRef = useRef<string | null>(null)
+  useEffect(() => { selectedIdRef.current = selectedRequest?.id ?? null }, [selectedRequest])
+  useEffect(() => {
+    if (!selectedIdRef.current) return
+    const fresh = requests.find((r) => r.id === selectedIdRef.current)
+    if (fresh) setSelectedRequest(fresh)
+  }, [requests])
 
   // Initial data load
   useEffect(() => {
@@ -42,51 +53,44 @@ export function DashboardPage() {
     getAllRequests()
   }, [getCars, getAllRequests])
 
-  // T07.12 — Realtime on requests
+  // U1 (ADR-1): the car roster now lives in request_cars, a separate table
+  // from requests — a full refetch on any change to either is simpler and
+  // more correct than trying to patch a joined multi-row relation
+  // client-side (the old single-car incremental-patch approach doesn't
+  // generalize to N cars). Debounced so a burst of changes (e.g. a bulk
+  // assign inserting several request_cars rows at once) triggers one
+  // refetch, not N.
+  //
+  // nfr-design Q1=B — the fleet-queue overview rides THIS callback instead of
+  // opening a second channel on the same tables: one 150ms debounce window then
+  // covers a burst (e.g. a bulk assign inserting several request_cars rows) for
+  // both reads, one refetch each instead of N.
   useEffect(() => {
-    const channel = supabase
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null
+    const scheduleRefetch = () => {
+      if (debounceTimer) clearTimeout(debounceTimer)
+      debounceTimer = setTimeout(() => {
+        getAllRequests()
+        getFleetQueueOverview()
+      }, 150)
+    }
+
+    const requestsChannel = supabase
       .channel('dashboard-requests')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'requests' },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            getAllRequests()
-          } else if (payload.eventType === 'UPDATE') {
-            const updated = payload.new as RequestWithLeader
-            // payload.new only has the requests table's own columns — the
-            // joined `cars` relation isn't included, so resolve it from the
-            // current cars list to keep the assigned-car display accurate.
-            const resolvedCar = updated.assigned_car_id
-              ? carsRef.current.find((c) => c.id === updated.assigned_car_id) ?? null
-              : null
-            const patch = {
-              ...updated,
-              cars: resolvedCar
-                ? {
-                    number: resolvedCar.number,
-                    pilot_name: resolvedCar.pilot_name,
-                    copilot_name: resolvedCar.copilot_name,
-                  }
-                : null,
-            }
-            setRequests((prev) =>
-              prev.map((r) => (r.id === patch.id ? { ...r, ...patch } : r))
-            )
-            setSelectedRequest((prev) =>
-              prev?.id === patch.id ? { ...prev, ...patch } : prev
-            )
-          } else if (payload.eventType === 'DELETE') {
-            setRequests((prev) => prev.filter((r) => r.id !== payload.old.id))
-            setSelectedRequest((prev) =>
-              prev?.id === payload.old.id ? null : prev
-            )
-          }
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, scheduleRefetch)
       .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [getAllRequests, setRequests])
+
+    const requestCarsChannel = supabase
+      .channel('dashboard-request-cars')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'request_cars' }, scheduleRefetch)
+      .subscribe()
+
+    return () => {
+      if (debounceTimer) clearTimeout(debounceTimer)
+      supabase.removeChannel(requestsChannel)
+      supabase.removeChannel(requestCarsChannel)
+    }
+  }, [getAllRequests, getFleetQueueOverview])
 
   // T07.13 — Realtime on cars
   useEffect(() => {
@@ -111,32 +115,58 @@ export function DashboardPage() {
     return () => { supabase.removeChannel(channel) }
   }, [setCars])
 
-  function handleInitiateAssign(car: Car) {
-    if (!selectedRequest) return
-    const isReassignment = selectedRequest.status === 'car_assigned'
-    const willReleaseBusyCar = car.operational_status === 'on_mission'
-    setPendingAssignment({ car, isReassignment, willReleaseBusyCar })
+  function handleInitiateAssign(carIds: string[]) {
+    setPendingAssignment({ carIds, conflict: null })
   }
 
-  async function handleConfirmAssignment() {
+  function handleRemoveCar(carId: string) {
+    if (!selectedRequest) return
+    removeCar(selectedRequest.id, carId)
+      .then(() => toast.success('Carro removido da missão'))
+      .catch(() => toast.error('Erro ao remover carro'))
+  }
+
+  // `mode` is what the operator picked in AssignmentModal's EnqueueOrTransferMenu
+  // (FILA-ADR-4). It only carries a real choice when there IS a conflict; on the
+  // free-car path the modal passes 'transfer' by convention and the RPC ignores
+  // it (a free car is assigned outright under either mode).
+  async function handleConfirmAssignment(mode: AssignMode) {
     if (!selectedRequest || !pendingAssignment) return
     try {
-      if (pendingAssignment.isReassignment) {
-        await reassignCar(selectedRequest.id, pendingAssignment.car.id)
-      } else {
-        await assignCar(selectedRequest.id, pendingAssignment.car.id)
+      // STEP (a), transfer only — free the busy car from its current mission.
+      // 'enqueue' deliberately skips this: the car never leaves its origin, the
+      // new mission just goes into its queue behind the current one (BR2).
+      if (pendingAssignment.conflict && mode === 'transfer') {
+        await confirmTransfer(selectedRequest.id, pendingAssignment.conflict.car.id)
       }
-      toast.success('Carro atribuído com sucesso')
-      setPendingAssignment(null)
 
-      const patch: Partial<RequestWithLeader> = {
-        status: 'car_assigned',
-        assigned_car_id: pendingAssignment.car.id,
+      // STEP (b) — re-submit the ORIGINAL full selection (FR1.3: all-or-nothing,
+      // no partial-batch special case per ADR-12). This runs on every path: the
+      // free-car first submission, the post-confirmTransfer re-submission, and
+      // the single-step enqueue. Skipping it after (a) would leave the car freed
+      // from its origin but never added to the destination.
+      const result = await (pendingAssignment.carIds.length > 1
+        ? addCars(selectedRequest.id, pendingAssignment.carIds, mode)
+        : addCar(selectedRequest.id, pendingAssignment.carIds[0], mode))
+      if (result.status === 'needs_confirmation') {
+        // Rare double-busy race — surface it again rather than looping silently.
+        // Unreachable under 'enqueue' (BR2: that mode never raises), kept as one
+        // shared branch rather than duplicated per mode.
+        const conflictingCar = cars.find((c) => c.id === result.conflictingCarId)
+        if (conflictingCar) {
+          setPendingAssignment({
+            carIds: pendingAssignment.carIds,
+            conflict: { car: conflictingCar, conflictingRequestId: result.conflictingRequestId },
+          })
+          return
+        }
       }
-      setRequests((prev) =>
-        prev.map((r) => (r.id === selectedRequest.id ? { ...r, ...patch } : r))
+      toast.success(
+        mode === 'enqueue' ? 'Carro(s) enfileirado(s) com sucesso' : 'Carro(s) atribuído(s) com sucesso',
       )
-      setSelectedRequest((prev) => (prev ? { ...prev, ...patch } : prev))
+      setPendingAssignment(null)
+      // Realtime (request_cars insert) will bring the authoritative roster;
+      // no optimistic patch needed now that it's a join, not a column.
     } catch (err) {
       const msg = err instanceof Error ? err.message : ''
       if (msg.toLowerCase().includes('not available')) {
@@ -160,6 +190,12 @@ export function DashboardPage() {
       'width=1000,height=800,noopener,noreferrer'
     )
   }
+
+  const pendingCars = pendingAssignment
+    ? pendingAssignment.carIds
+        .map((id) => cars.find((c) => c.id === id))
+        .filter((c): c is Car => !!c)
+    : []
 
   return (
     <div className="relative flex flex-col flex-1 min-h-0">
@@ -260,19 +296,19 @@ export function DashboardPage() {
         )}
       </main>
 
-      <RequestDetailSidebar
+      <DashboardRequestSidebar
         request={selectedRequest}
         cars={cars}
         onClose={() => setSelectedRequest(null)}
         onInitiateAssign={handleInitiateAssign}
+        onRemoveCar={handleRemoveCar}
       />
 
-      {pendingAssignment && selectedRequest && (
+      {pendingAssignment && selectedRequest && pendingCars.length > 0 && (
         <AssignmentModal
           request={selectedRequest}
-          car={pendingAssignment.car}
-          isReassignment={pendingAssignment.isReassignment}
-          willReleaseBusyCar={pendingAssignment.willReleaseBusyCar}
+          selectedCars={pendingCars}
+          conflict={pendingAssignment.conflict}
           loading={assigning}
           onConfirm={handleConfirmAssignment}
           onClose={() => setPendingAssignment(null)}

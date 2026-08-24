@@ -6,12 +6,14 @@ import { DestinationMarker } from './DestinationMarker'
 import { useCarLocations, type CarLocation } from './useCarLocations'
 import type { Car } from '../cars/useCars'
 import type { RequestWithLeader } from './useAllRequests'
-import type { RequestStatus } from '../requests/useRequests'
 
 const BLUMENAU_CENTER = { lat: -26.9194, lng: -49.0661 }
 const TWO_MINUTES_MS = 2 * 60 * 1000
 
-const ACTIVE_STATUSES: RequestStatus[] = ['car_assigned', 'on_the_way', 'on_site', 'returning']
+// U1 (ADR-3) narrowed requests.status to 5 request-level values — a mission
+// with 1+ active cars is always 'car_assigned' now, regardless of any
+// individual car's own progress (request_cars.status). "Active for the map"
+// therefore means: has at least one assigned car and isn't closed/cancelled.
 
 const MAP_OPTIONS = {
   disableDefaultUI: true,
@@ -70,7 +72,7 @@ function MapContent({
   }, [setLocations])
 
   const activeRequests = useMemo(
-    () => requests.filter((r) => ACTIVE_STATUSES.includes(r.status) && r.assigned_car_id),
+    () => requests.filter((r) => r.status === 'car_assigned' && r.cars.length > 0),
     [requests]
   )
 
@@ -102,25 +104,31 @@ function MapContent({
       zoom={13}
       options={MAP_OPTIONS}
     >
-      {/* Destinos e polilinhas primeiro — ficam abaixo dos marcadores de carro */}
+      {/* Destinos e polilinhas primeiro — ficam abaixo dos marcadores de carro.
+          Uma polyline por CARRO ativo na missão (era uma por missão, quando
+          só existia um carro possível por missão). */}
       {activeRequests.map((req) => {
         const dest = destinations[req.id]
         if (!dest) return null
-        const carLoc = locations.find((l) => l.car_id === req.assigned_car_id)
         return (
           <Fragment key={req.id}>
             <DestinationMarker request={req} position={dest} />
-            {carLoc && (
-              <Polyline
-                path={[{ lat: carLoc.latitude, lng: carLoc.longitude }, dest]}
-                options={{
-                  strokeColor: '#E91E8C',
-                  strokeOpacity: 0.7,
-                  strokeWeight: 2,
-                  geodesic: true,
-                }}
-              />
-            )}
+            {req.cars.map((ac) => {
+              const carLoc = locations.find((l) => l.car_id === ac.carId)
+              if (!carLoc) return null
+              return (
+                <Polyline
+                  key={ac.carId}
+                  path={[{ lat: carLoc.latitude, lng: carLoc.longitude }, dest]}
+                  options={{
+                    strokeColor: '#E91E8C',
+                    strokeOpacity: 0.7,
+                    strokeWeight: 2,
+                    geodesic: true,
+                  }}
+                />
+              )
+            })}
           </Fragment>
         )
       })}

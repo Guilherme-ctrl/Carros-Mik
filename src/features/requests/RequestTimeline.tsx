@@ -1,19 +1,28 @@
 import { useCallback, useEffect, useState } from 'react'
 import { format } from 'date-fns'
 import { supabase } from '../../lib/supabase'
-import type { RequestStatus } from './useRequests'
+
+// request_history.from_status/to_status intentionally kept on the LEGACY
+// 8-value enum (U1 ADR-2: "request_history keeps the legacy enum so history
+// is not rewritten") — real historical rows, and even new car_added/
+// car_removed events, can carry on_the_way/on_site/returning here even
+// though requests.status itself was narrowed to 5 values. Do not import
+// RequestStatus (the narrowed type) for this file.
+type LegacyRequestStatus =
+  | 'open' | 'under_review' | 'car_assigned' | 'on_the_way' | 'on_site' | 'returning'
+  | 'completed' | 'cancelled'
 
 interface HistoryEntry {
   id: string
-  from_status: RequestStatus | null
-  to_status: RequestStatus
+  from_status: LegacyRequestStatus | null
+  to_status: LegacyRequestStatus
   changed_by: string | null
   notes: string | null
   created_at: string
   changed_by_name: string
 }
 
-const STATUS_LABEL: Record<RequestStatus, string> = {
+const STATUS_LABEL: Record<LegacyRequestStatus, string> = {
   open:         'Aberta',
   under_review: 'Em análise',
   car_assigned: 'Designado',

@@ -1,13 +1,12 @@
 import { useCallback, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 
+// Narrowed by U1 (ADR-3) — per-car progress (on_the_way/on_site/returning)
+// moved to request_cars.status; this is request-level only now.
 export type RequestStatus =
   | 'open'
   | 'under_review'
   | 'car_assigned'
-  | 'on_the_way'
-  | 'on_site'
-  | 'returning'
   | 'completed'
   | 'cancelled'
 

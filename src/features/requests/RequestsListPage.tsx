@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../auth/useAuth'
 import { Button } from '../../shared/components/ui/Button'
-import { RequestDetailSidebar } from './RequestDetailSidebar'
+import { LeaderRequestSidebar } from './LeaderRequestSidebar'
 import { RequestStatusBadge } from './RequestStatusBadge'
 import { useRequests, type Request } from './useRequests'
 import { useUnreadMessageCounts } from '../notifications/useUnreadMessageCounts'
@@ -185,7 +185,7 @@ export function RequestsListPage() {
         )}
       </div>
 
-      <RequestDetailSidebar
+      <LeaderRequestSidebar
         request={selectedRequest}
         onClose={() => setSelectedRequest(null)}
       />

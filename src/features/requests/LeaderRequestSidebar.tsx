@@ -3,6 +3,7 @@ import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { RequestStatusBadge } from './RequestStatusBadge'
 import { RequestTimeline } from './RequestTimeline'
+import { CloseMissionButton } from './CloseMissionButton'
 import { CommentsPanel } from './CommentsPanel'
 import { OutcomeBadge } from './OutcomeBadge'
 import type { Request } from './useRequests'
@@ -11,6 +12,9 @@ import { markChatAsRead } from '../notifications/notificationsService'
 import { useUpdateStatus } from './useUpdateStatus'
 
 interface CarInfo {
+  carId: string
+  number: string
+  outcome: string | null
   pilot_name: string
   pilot_phone: string
   copilot_name: string | null
@@ -40,8 +44,13 @@ interface Props {
 
 const CANCELLABLE = new Set(['open', 'under_review'])
 
-export function RequestDetailSidebar({ request, onClose }: Props) {
-  const [car, setCar] = useState<CarInfo | null>(null)
+// ADR-9 — was requests/RequestDetailSidebar.tsx; renamed to resolve the
+// naming collision with dashboard/RequestDetailSidebar.tsx (now
+// DashboardRequestSidebar.tsx). This one stays read-mostly — leaders don't
+// assign cars, they just see who's on the mission (existing persona split).
+export function LeaderRequestSidebar({ request, onClose }: Props) {
+  // FR3-equivalent — the roster is now 0..N cars, not a single one.
+  const [cars, setCars] = useState<CarInfo[]>([])
   const [leader, setLeader] = useState<LeaderInfo | null>(null)
   const [timelineKey, setTimelineKey] = useState(0)
   const { updateStatus, loading: cancelling } = useUpdateStatus()
@@ -59,24 +68,40 @@ export function RequestDetailSidebar({ request, onClose }: Props) {
 
   useEffect(() => {
     if (!request) {
-      setCar(null)
+      setCars([])
       setLeader(null)
       return
     }
 
-    setCar(null)
+    setCars([])
     setLeader(null)
     setTimelineKey((k) => k + 1)
     markChatAsRead(request.id)
 
-    if (request.assigned_car_id) {
-      supabase
-        .from('cars')
-        .select('pilot_name, pilot_phone, copilot_name, copilot_phone')
-        .eq('id', request.assigned_car_id)
-        .maybeSingle()
-        .then(({ data }) => setCar(data))
-    }
+    // U1 (ADR-1): the roster lives in request_cars now, not a single
+    // assigned_car_id column — 0..N active rows per request.
+    supabase
+      .from('request_cars')
+      // number/outcome entram para o botão de encerrar (20260824000002), que
+      // precisa saber quem já reportou. is_current é correção: sem ele os
+      // carros que têm esta missão apenas na fila apareciam como se
+      // estivessem nela.
+      .select('car_id, outcome, cars(number, pilot_name, pilot_phone, copilot_name, copilot_phone)')
+      .eq('request_id', request.id)
+      .eq('is_current', true)
+      .is('removed_at', null)
+      .then(({ data }) => {
+        const rows = (data ?? []) as unknown as Array<{
+          car_id: string
+          outcome: string | null
+          cars: { number: string; pilot_name: string; pilot_phone: string; copilot_name: string | null; copilot_phone: string | null } | null
+        }>
+        setCars(
+          rows
+            .filter((r) => r.cars !== null)
+            .map((r) => ({ carId: r.car_id, outcome: r.outcome, ...r.cars! }))
+        )
+      })
 
     supabase
       .from('leaders')
@@ -140,8 +165,13 @@ export function RequestDetailSidebar({ request, onClose }: Props) {
             {leader && (
               <_Field label="Líder" value={`${leader.name} · ${formatPhoneForDisplay(leader.phone)}`} />
             )}
-            {car && (
-              <_Field label="Carro" value={[car.pilot_name, car.copilot_name].filter(Boolean).join(' / ')} />
+            {cars.length > 0 && (
+              <_Field
+                label={cars.length > 1 ? 'Carros' : 'Carro'}
+                value={cars
+                  .map((c) => [c.pilot_name, c.copilot_name].filter(Boolean).join(' / '))
+                  .join(' · ')}
+              />
             )}
           </div>
 
@@ -161,14 +191,28 @@ export function RequestDetailSidebar({ request, onClose }: Props) {
             </div>
           )}
 
+          {/* Encerramento manual (20260824000002) — o Líder da mesa também pode
+              encerrar, decisão do dono do produto: quem sentiu o problema
+              confirma que foi resolvido. */}
+          {request.status === 'car_assigned' && (
+            <CloseMissionButton
+              requestId={request.id}
+              cars={cars.map((c) => ({ number: c.number, outcome: c.outcome }))}
+              onClosed={() => setTimelineKey((k) => k + 1)}
+            />
+          )}
+
           {/* Comentários */}
           <div className="pt-2 border-t border-zinc-800">
             <p className="text-zinc-500 text-xs uppercase tracking-wide mb-3">Comentários</p>
             <CommentsPanel
               requestId={request.id}
+              // FR3-equivalent: with N cars, WhatsApp quick-contact targets the
+              // first assigned car — a deliberate simplification for this
+              // read-mostly leader view, not a limitation of the data model.
               contact={{
-                pilotName: car?.pilot_name,
-                pilotPhone: car?.pilot_phone,
+                pilotName: cars[0]?.pilot_name,
+                pilotPhone: cars[0]?.pilot_phone,
                 leaderName: leader?.name,
                 leaderPhone: leader?.phone,
               }}

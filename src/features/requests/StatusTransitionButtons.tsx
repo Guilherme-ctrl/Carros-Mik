@@ -3,23 +3,23 @@ import { Button } from '../../shared/components/ui/Button'
 import { useUpdateStatus } from './useUpdateStatus'
 import type { RequestStatus } from './useRequests'
 
-// Valid next states for each status, excluding car_assigned (handled by the car picker).
+// Narrowed by U1 (ADR-3): update_request_status only accepts request-level
+// transitions now (open/under_review/cancelled). The car_assigned→
+// on_the_way→on_site→returning→completed chain that Mesa Central could
+// previously drive manually from here moved to per-car ownership
+// (update_car_status, mobile-only) — with N possible cars per mission there
+// is no longer a single "the" car whose progress a lone button here could
+// mean. Mesa Central can still cancel a mission at any pre-completion stage.
 const NEXT_STATES: Partial<Record<RequestStatus, RequestStatus[]>> = {
   open:         ['under_review', 'cancelled'],
   under_review: ['cancelled'],
-  car_assigned: ['on_the_way', 'cancelled'],
-  on_the_way:   ['on_site'],
-  on_site:      ['returning', 'completed'],
-  returning:    ['completed'],
+  car_assigned: ['cancelled'],
 }
 
 const STATUS_LABEL: Record<RequestStatus, string> = {
   open:         'Aberta',
   under_review: 'Em análise',
   car_assigned: 'Designado',
-  on_the_way:   'A caminho',
-  on_site:      'No local',
-  returning:    'Retornando',
   completed:    'Concluída',
   cancelled:    'Cancelada',
 }
