@@ -7,14 +7,18 @@ import { supabase } from '../../lib/supabase'
 // Existe porque reportar "Achei"/"Não achei" parou de encerrar: o desfecho de
 // cada carro é só um registro, e a missão fecha aqui. Mesa Central, Líder da
 // mesa e chefe de carro podem chamar — a autorização é do RPC, não desta tela.
+export async function closeRequestRpc(requestId: string): Promise<void> {
+  const { error } = await supabase.rpc('close_request', { p_request_id: requestId })
+  if (error) throw error
+}
+
 export function useCloseRequest() {
   const [loading, setLoading] = useState(false)
 
   async function closeRequest(requestId: string): Promise<boolean> {
     setLoading(true)
     try {
-      const { error } = await supabase.rpc('close_request', { p_request_id: requestId })
-      if (error) throw error
+      await closeRequestRpc(requestId)
       toast.success('Missão encerrada')
       return true
     } catch (err) {

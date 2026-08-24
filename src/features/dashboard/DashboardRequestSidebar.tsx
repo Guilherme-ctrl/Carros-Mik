@@ -5,6 +5,7 @@ import { RequestStatusBadge } from '../requests/RequestStatusBadge'
 import { StatusTransitionButtons } from '../requests/StatusTransitionButtons'
 import { RequestTimeline } from '../requests/RequestTimeline'
 import { CloseMissionButton } from '../requests/CloseMissionButton'
+import { useNudgeCar } from '../notifications/useNudgeCar'
 import { Button } from '../../shared/components/ui/Button'
 import { WhatsAppContactButton } from '../../shared/components/WhatsAppContactButton'
 import type { Car } from '../cars/useCars'
@@ -38,6 +39,7 @@ export function DashboardRequestSidebar({
   request, cars, onClose, onInitiateAssign, onRemoveCar,
 }: Props) {
   const [selectedCarIds, setSelectedCarIds] = useState<string[]>([])
+  const { nudge, nudgingCarId } = useNudgeCar()
   // Incremented on each request_history INSERT to trigger RequestTimeline re-fetch
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0)
 
@@ -165,6 +167,20 @@ export function DashboardRequestSidebar({
                         </p>
                         <p className="text-zinc-500 text-[11px]">{CAR_STATUS_LABEL[ac.status] ?? ac.status}</p>
                       </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                      {/* "Cutucar" — manda um push para o motorista deste carro
+                          sem mexer na missão. Fica ao lado de Remover porque é
+                          a alternativa mais branda para o mesmo impulso: o
+                          carro não está respondendo. */}
+                      <button
+                        onClick={() => nudge(ac.carId, ac.number, request.id)}
+                        disabled={nudgingCarId === ac.carId}
+                        className="shrink-0 text-zinc-500 hover:text-amber-400 transition-colors text-xs px-2 py-1 rounded hover:bg-amber-500/10 disabled:opacity-40"
+                        aria-label={`Cutucar carro ${ac.number}`}
+                        title="Enviar uma notificação para o motorista deste carro"
+                      >
+                        {nudgingCarId === ac.carId ? '…' : 'Cutucar'}
+                      </button>
                       {/* FR4 — remove this car without affecting the others */}
                       <button
                         onClick={() => onRemoveCar(ac.carId)}
@@ -173,6 +189,7 @@ export function DashboardRequestSidebar({
                       >
                         Remover
                       </button>
+                      </div>
                     </div>
                   ))}
                 </div>
