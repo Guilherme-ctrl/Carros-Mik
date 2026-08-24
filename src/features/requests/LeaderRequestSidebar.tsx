@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { RequestStatusBadge } from './RequestStatusBadge'
 import { RequestTimeline } from './RequestTimeline'
 import { CloseMissionButton } from './CloseMissionButton'
+import { ReopenMissionButton } from './ReopenMissionButton'
 import { CommentsPanel } from './CommentsPanel'
 import { OutcomeBadge } from './OutcomeBadge'
 import type { Request } from './useRequests'
@@ -199,6 +200,13 @@ export function LeaderRequestSidebar({ request, onClose }: Props) {
               requestId={request.id}
               cars={cars.map((c) => ({ number: c.number, outcome: c.outcome }))}
               onClosed={() => setTimelineKey((k) => k + 1)}
+            />
+          )}
+
+          {request.status === 'completed' && (
+            <ReopenMissionButton
+              requestId={request.id}
+              onReopened={() => setTimelineKey((k) => k + 1)}
             />
           )}
 

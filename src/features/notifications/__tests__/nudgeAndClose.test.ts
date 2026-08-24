@@ -5,6 +5,7 @@ vi.mock('../../../lib/supabase', () => ({ supabase: { rpc: rpcMock } }))
 
 import { nudgeCarRpc } from '../useNudgeCar'
 import { closeRequestRpc } from '../../requests/useCloseRequest'
+import { reopenRequestRpc } from '../../requests/useReopenRequest'
 
 // Contrato com o banco: nome do RPC e nome dos parâmetros. Um erro de digitação
 // aqui só apareceria como 404 do PostgREST em produção, no meio do evento.
@@ -53,5 +54,42 @@ describe('closeRequestRpc', () => {
       error: new Error('Ainda falta o desfecho do(s) carro(s): 12, 15'),
     })
     await expect(closeRequestRpc('req-1')).rejects.toThrow(/falta o desfecho/)
+  })
+})
+
+describe('reopenRequestRpc', () => {
+  beforeEach(() => rpcMock.mockReset())
+
+  // RETURNS TABLE volta como array de linhas. Ler isto errado (tratar como
+  // objeto) faria as duas listas virem vazias e a tela diria "nenhum carro
+  // voltou" mesmo quando todos voltaram.
+  it('desembrulha a linha do RETURNS TABLE', async () => {
+    rpcMock.mockResolvedValue({
+      data: [{ restored_car_numbers: ['R-B'], unavailable_car_numbers: ['R-A'] }],
+      error: null,
+    })
+    await expect(reopenRequestRpc('req-1')).resolves.toEqual({
+      restored: ['R-B'],
+      unavailable: ['R-A'],
+    })
+  })
+
+  it('trata listas nulas como vazias', async () => {
+    rpcMock.mockResolvedValue({
+      data: [{ restored_car_numbers: null, unavailable_car_numbers: null }],
+      error: null,
+    })
+    await expect(reopenRequestRpc('req-1')).resolves.toEqual({
+      restored: [],
+      unavailable: [],
+    })
+  })
+
+  it('propaga a recusa de missão não encerrada', async () => {
+    rpcMock.mockResolvedValue({
+      data: null,
+      error: new Error('Só é possível reabrir uma missão encerrada (esta está: open)'),
+    })
+    await expect(reopenRequestRpc('req-1')).rejects.toThrow(/reabrir uma missão encerrada/)
   })
 })

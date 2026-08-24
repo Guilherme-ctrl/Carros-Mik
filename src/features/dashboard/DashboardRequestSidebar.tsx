@@ -5,6 +5,7 @@ import { RequestStatusBadge } from '../requests/RequestStatusBadge'
 import { StatusTransitionButtons } from '../requests/StatusTransitionButtons'
 import { RequestTimeline } from '../requests/RequestTimeline'
 import { CloseMissionButton } from '../requests/CloseMissionButton'
+import { ReopenMissionButton } from '../requests/ReopenMissionButton'
 import { useNudgeCar } from '../notifications/useNudgeCar'
 import { Button } from '../../shared/components/ui/Button'
 import { WhatsAppContactButton } from '../../shared/components/WhatsAppContactButton'
@@ -247,6 +248,13 @@ export function DashboardRequestSidebar({
                   outcome: c.outcome,
                 }))}
                 onClosed={() => setHistoryRefreshKey((k) => k + 1)}
+              />
+            )}
+
+            {request.status === 'completed' && (
+              <ReopenMissionButton
+                requestId={request.id}
+                onReopened={() => setHistoryRefreshKey((k) => k + 1)}
               />
             )}
 
