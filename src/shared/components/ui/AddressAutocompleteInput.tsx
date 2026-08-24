@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '../../lib/cn'
+import { buildSearchParams } from './addressSearch'
 
 interface NominatimAddress {
   house_number?: string
@@ -33,23 +34,6 @@ interface AddressData {
 // Caixa que cobre Blumenau e as cidades vizinhas onde a gincana acontece
 // (Gaspar, Indaial, Timbó, Pomerode), com folga nas bordas.
 // Formato do Nominatim: <oeste>,<norte>,<leste>,<sul>.
-export const REGION_VIEWBOX = '-49.40,-26.65,-48.85,-27.15'
-
-// Exportada para o teste conseguir travar o recorte. Sem ele, alguém remove o
-// `bounded` numa refatoração e a busca volta a devolver Curitiba — que foi
-// exatamente o que a queixa de "difícil preencher o endereço" era.
-export function buildSearchParams(query: string): URLSearchParams {
-  return new URLSearchParams({
-    q: query,
-    countrycodes: 'br',
-    format: 'json',
-    addressdetails: '1',
-    limit: '6',
-    viewbox: REGION_VIEWBOX,
-    bounded: '1',
-  })
-}
-
 interface Props {
   onSelect: (data: AddressData) => void
   error?: string

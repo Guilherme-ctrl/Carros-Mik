@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { REGION_VIEWBOX, buildSearchParams } from '../AddressAutocompleteInput'
+import { REGION_VIEWBOX, buildSearchParams } from '../addressSearch'
 
 // Medido contra o Nominatim em 2026-08-24: sem `viewbox`+`bounded`, buscar
 // "Rua XV de Novembro" devolvia Curitiba, Niterói e Osasco — nenhum resultado
