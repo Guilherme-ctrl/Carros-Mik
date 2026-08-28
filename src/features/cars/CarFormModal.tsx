@@ -4,6 +4,7 @@ import { Input } from '../../shared/components/ui/Input'
 import { PhoneInput } from '../../shared/components/PhoneInput'
 import { stripPhonePrefix } from '../../shared/utils/phone'
 import type { Car, DriverUser } from './useCars'
+import { DriverUserPicker } from './DriverUserPicker'
 
 interface Props {
   car?: Car
@@ -134,25 +135,12 @@ export function CarFormModal({ car, driverUsers, onClose, onSubmit }: Props) {
             disabled={loading}
           />
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="driver-user" className="text-sm font-medium text-zinc-300">
-              Motorista (app) (opcional)
-            </label>
-            <select
-              id="driver-user"
-              value={driverUserId}
-              onChange={(e) => setDriverUserId(e.target.value)}
-              disabled={loading}
-              className="h-9 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-zinc-600 disabled:opacity-50"
-            >
-              <option value="">— Nenhum —</option>
-              {driverUsers.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.display_name} ({u.email})
-                </option>
-              ))}
-            </select>
-          </div>
+          <DriverUserPicker
+            users={driverUsers}
+            value={driverUserId}
+            onChange={setDriverUserId}
+            disabled={loading}
+          />
 
           <div className="flex gap-3 pt-1">
             <Button type="button" variant="ghost" onClick={onClose} disabled={loading} className="flex-1">

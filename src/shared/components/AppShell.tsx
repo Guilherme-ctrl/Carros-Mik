@@ -8,6 +8,7 @@ const NAV = [
   { to: '/admin/leaders', label: 'Líderes',      roles: ['central_admin', 'central_operator'] },
   { to: '/admin/cars',    label: 'Carros',       roles: ['central_admin', 'central_operator'] },
   { to: '/admin/users',   label: 'Usuários',     roles: ['central_admin'] },
+  { to: '/manuais', label: 'Manuais' },
 ]
 
 function MobileNav() {

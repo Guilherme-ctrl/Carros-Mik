@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Cartão de bolso — Gincana Mik Dundee">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img,svg{display:block;max-width:100%}</style>
+</head>
+<body>
+<title>Cartão de Bolso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@500;600&display=swap">
+
+<style>
+/* ============================================================
+   Peça impressa: a folha é sempre papel branco, nos dois temas.
+   Só o fundo ao redor acompanha o tema do leitor.
+   ============================================================ */
+:root{
+  --around:#E8E4EE;
+  --paper:#FFFFFF;
+  --ink:#14101B;
+  --ink-2:#4A4358;
+  --ink-3:#7C7490;
+  --rule:#DED8E6;
+  --pink:#E91E8C;
+  --pink-deep:#B5146D;
+  --pink-tint:#FDE9F4;
+  --r-driver:#D4127E;
+  --r-leader:#1F5AB0;
+  --r-central:#9A5A00;
+  --r-admin:#5836A6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --around:#0D0D18; }
+}
+:root[data-theme="dark"]{ --around:#0D0D18; }
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--around);
+  font-family:Inter, ui-sans-serif, system-ui, sans-serif;
+  color:var(--ink);
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+  display:flex;
+  justify-content:center;
+  padding:24px 16px;
+}
+h1,h2,h3{font-family:Poppins, Inter, sans-serif; margin:0; line-height:1.1; text-wrap:balance}
+p{margin:0}
+
+.sheet{
+  width:210mm;
+  min-height:297mm;
+  max-width:100%;
+  background:var(--paper);
+  padding:13mm 12mm;
+  display:flex;
+  flex-direction:column;
+  gap:7mm;
+  box-shadow:0 20px 60px -30px rgba(0,0,0,.6);
+  border-radius:3px;
+}
+
+/* ---------- cabeçalho ---------- */
+.head{display:flex; align-items:center; gap:14px; padding-bottom:6mm; border-bottom:3px solid var(--pink)}
+.head svg{width:74px; height:auto; flex:0 0 auto; border-radius:8px}
+.head .t{display:flex; flex-direction:column; gap:2px; flex:1; min-width:0}
+.kicker{
+  font-family:"Fira Code", monospace; font-size:10px; font-weight:600;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--pink-deep);
+}
+.head h1{font-size:29px; font-weight:800; letter-spacing:-.02em}
+.head .sub{font-size:13px; color:var(--ink-2)}
+.head .site{
+  font-family:"Fira Code", monospace; font-size:11.5px; font-weight:600;
+  color:var(--ink); background:var(--pink-tint); border:1px solid var(--pink);
+  border-radius:7px; padding:7px 11px; white-space:nowrap; align-self:center;
+}
+
+/* ---------- o ciclo ---------- */
+.cycle{
+  display:flex; align-items:stretch; gap:0;
+  border:1px solid var(--rule); border-radius:10px; overflow:hidden;
+}
+.cycle .st{
+  flex:1; padding:9px 10px; display:flex; flex-direction:column; gap:2px;
+  border-right:1px solid var(--rule);
+}
+.cycle .st:last-child{border-right:0}
+.cycle .n{
+  font-family:"Fira Code", monospace; font-size:9px; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+}
+.cycle .w{font-family:Poppins,sans-serif; font-weight:700; font-size:12.5px; line-height:1.15}
+.cycle .d{font-size:10.5px; color:var(--ink-2); line-height:1.3}
+
+/* ---------- os quatro papéis ---------- */
+.roles{display:grid; grid-template-columns:1fr 1fr; gap:5mm; flex:1}
+.role{
+  border:1.5px solid var(--rule); border-radius:11px; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.role .bar{height:6px}
+.role .in{padding:11px 13px 13px; display:flex; flex-direction:column; gap:7px; flex:1}
+.role .top{display:flex; align-items:baseline; justify-content:space-between; gap:8px}
+.role h2{font-size:17px; font-weight:800; letter-spacing:-.01em}
+.role .where{
+  font-family:"Fira Code", monospace; font-size:9px; font-weight:600;
+  letter-spacing:.12em; text-transform:uppercase; white-space:nowrap;
+}
+.role ul{margin:0; padding-left:15px; display:flex; flex-direction:column; gap:4.5px}
+.role li{font-size:12.5px; line-height:1.35; color:var(--ink-2)}
+.role li b{color:var(--ink); font-weight:650}
+.role .foot{
+  margin-top:auto; padding-top:8px; border-top:1px dashed var(--rule);
+  font-size:11.5px; line-height:1.35; color:var(--ink);
+}
+.role .foot b{font-weight:700}
+
+.r1 .bar{background:var(--r-driver)}  .r1 .where{color:var(--r-driver)}
+.r2 .bar{background:var(--r-leader)}  .r2 .where{color:var(--r-leader)}
+.r3 .bar{background:var(--r-central)} .r3 .where{color:var(--r-central)}
+.r4 .bar{background:var(--r-admin)}   .r4 .where{color:var(--r-admin)}
+
+/* ---------- status ---------- */
+.legend{
+  border:1px solid var(--rule); border-radius:10px; padding:10px 13px;
+  display:flex; flex-direction:column; gap:7px;
+}
+.legend .lt{
+  font-family:"Fira Code", monospace; font-size:9.5px; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{
+  display:inline-flex; align-items:center; gap:5px;
+  border-radius:999px; padding:3px 9px 3px 7px;
+  font-family:"Fira Code", monospace; font-size:9.5px; font-weight:600;
+  letter-spacing:.05em; text-transform:uppercase;
+  border:1px solid currentColor;
+}
+.chip .d{width:6px; height:6px; border-radius:999px; background:currentColor}
+.chip i{font-style:normal; color:var(--ink-2); font-family:Inter,sans-serif;
+  font-size:10px; letter-spacing:0; text-transform:none; font-weight:500}
+.k-open{color:#1F5AB0}  .k-rev{color:#9A5A00}  .k-ass{color:#6D3FC4}
+.k-done{color:#15803D}  .k-can{color:#C02626}
+
+/* ---------- rodapé ---------- */
+.foot-bar{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding-top:5mm; border-top:1px solid var(--rule);
+  font-size:11px; color:var(--ink-3);
+}
+.foot-bar .fill{
+  flex:1; border-bottom:1px solid var(--ink-3); min-width:90px; height:14px;
+}
+
+@media print{
+  @page{ size:A4; margin:0 }
+  body{background:#fff; padding:0; display:block}
+  .sheet{box-shadow:none; border-radius:0; width:auto; min-height:auto}
+}
+@media screen and (max-width:800px){
+  body{padding:12px 8px}
+  .sheet{padding:16px 14px; gap:16px}
+  .roles{grid-template-columns:1fr}
+  .cycle{flex-wrap:wrap}
+  .cycle .st{flex:1 1 45%; border-bottom:1px solid var(--rule)}
+  .head{flex-wrap:wrap}
+}
+</style>
+
+<div class="sheet">
+
+  <header class="head">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 90" role="img" aria-label="Jacaré Mik Dundee">
+      <rect width="180" height="90" rx="14" fill="#ffe4f1"/>
+      <g transform="translate(10,10)">
+        <path d="M10 40c30-25 60-25 90 0 10 8 30-5 40 6-12 8-28 4-33 8-4 4-8 8-20 8H30c-8 0-20-10-20-22z" fill="#00a862"/>
+        <circle cx="36" cy="30" r="8" fill="#fff"/><circle cx="36" cy="30" r="3" fill="#222"/>
+        <circle cx="52" cy="28" r="6" fill="#fff"/><circle cx="52" cy="28" r="2.5" fill="#222"/>
+        <path d="M15 45h35c3 0 5 2 5 5v3H10v-3c0-3 2-5 5-5z" fill="#e0ffd8"/>
+        <path d="M132 44l14-6 8 6-8 6z" fill="#007a49"/>
+      </g>
+    </svg>
+    <div class="t">
+      <span class="kicker">Carros de apoio · Gincana Mik Dundee</span>
+      <h1>Cartão de bolso</h1>
+      <span class="sub">O que cada um faz, em uma folha. Imprima e deixe à vista.</span>
+    </div>
+    <span class="site">carros-mik.vercel.app</span>
+  </header>
+
+  <section class="cycle" aria-label="Ciclo de uma missão">
+    <div class="st"><span class="n">1 · Líder</span><span class="w">Abre o pedido</span><span class="d">Onde é e o que precisa.</span></div>
+    <div class="st"><span class="n">2 · Mesa</span><span class="w">Manda o carro</span><span class="d">Escolhe pelo mapa.</span></div>
+    <div class="st"><span class="n">3 · Motorista</span><span class="w">Faz a missão</span><span class="d">Abre o Maps e vai.</span></div>
+    <div class="st"><span class="n">4 · Motorista</span><span class="w">Achei / Não achei</span><span class="d">Diz o resultado.</span></div>
+    <div class="st"><span class="n">5 · Qualquer um</span><span class="w">Encerra</span><span class="d">Libera o carro.</span></div>
+  </section>
+
+  <section class="roles">
+
+    <article class="role r1">
+      <div class="bar"></div>
+      <div class="in">
+        <div class="top"><h2>Motorista</h2><span class="where">App no celular</span></div>
+        <ul>
+          <li><b>Deixe o app aberto na tela.</b> É assim que a Mesa te vê no mapa.</li>
+          <li>A missão chega sozinha, com aviso.</li>
+          <li><b>Botão rosa</b> marca o trajeto: Iniciar → Cheguei → Retornando.</li>
+          <li><b>Achei / Não achei</b> valem desde o começo — não espere o trajeto.</li>
+          <li>Tocou no errado? Toque no outro, dá para trocar.</li>
+          <li><b>+N</b> rosa = missões esperando por você.</li>
+        </ul>
+        <p class="foot">Por último: <b>Encerrar missão</b>. Sem isso o seu carro não fica livre.</p>
+      </div>
+    </article>
+
+    <article class="role r2">
+      <div class="bar"></div>
+      <div class="in">
+        <div class="top"><h2>Líder de Mesa</h2><span class="where">Site</span></div>
+        <ul>
+          <li><b>+ Nova Solicitação</b> e preencha.</li>
+          <li>Use a <b>busca de endereço</b> — ela marca o ponto exato para o motorista.</li>
+          <li>Objetivo claro: é o que o motorista lê.</li>
+          <li>Acompanhe: <b>Para fazer → Fazendo → Feito</b>.</li>
+          <li>Clique no cartão para comentar ou chamar no WhatsApp.</li>
+        </ul>
+        <p class="foot"><b>Cancelar</b> não tem volta. <b>Encerrar</b> tem: existe Reabrir.</p>
+      </div>
+    </article>
+
+    <article class="role r3">
+      <div class="bar"></div>
+      <div class="in">
+        <div class="top"><h2>Mesa Central</h2><span class="where">Site</span></div>
+        <ul>
+          <li>Clique no pedido → escolha o carro → confirme.</li>
+          <li>Dá para mandar <b>mais de um carro</b> na mesma missão.</li>
+          <li>Carro ocupado: <b>Enfileirar</b> (espera) ou <b>Transferir agora</b> (urgente).</li>
+          <li><b>Alta / Normal / Baixa</b> ordenam a fila de cada carro.</li>
+          <li><b>Cutucar</b> quando o carro sumir.</li>
+        </ul>
+        <p class="foot"><b>Baixe a planilha</b> no fim do evento — e ao primeiro sinal de instabilidade.</p>
+      </div>
+    </article>
+
+    <article class="role r4">
+      <div class="bar"></div>
+      <div class="in">
+        <div class="top"><h2>Administrador</h2><span class="where">Site · antes do evento</span></div>
+        <ul>
+          <li>Crie os <b>usuários</b> com papel e senha temporária.</li>
+          <li>Cadastre os <b>líderes</b> com telefone certo.</li>
+          <li>Cadastre os <b>carros</b> com piloto e telefone.</li>
+          <li>No carro, preencha <b>Motorista (app)</b> — é o passo mais esquecido.</li>
+          <li>Envie os convites do app com antecedência.</li>
+        </ul>
+        <p class="foot">Sem <b>Motorista (app)</b>, o app diz “Carro não configurado para este usuário”.</p>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="legend">
+    <span class="lt">As etiquetas que você vai ver</span>
+    <div class="chips">
+      <span class="chip k-open"><span class="d"></span>Aberta <i>· sem carro</i></span>
+      <span class="chip k-rev"><span class="d"></span>Em análise <i>· a Mesa está decidindo</i></span>
+      <span class="chip k-ass"><span class="d"></span>Designado <i>· carro a caminho</i></span>
+      <span class="chip k-done"><span class="d"></span>Concluída <i>· alguém encerrou</i></span>
+      <span class="chip k-can"><span class="d"></span>Cancelada <i>· não vai acontecer</i></span>
+    </div>
+  </section>
+
+  <footer class="foot-bar">
+    <span>Deu problema? Resolva pelo rádio ou WhatsApp e registre depois.</span>
+    <span>Suporte:</span><span class="fill"></span>
+  </footer>
+
+</div>
+
+</body>
+</html>

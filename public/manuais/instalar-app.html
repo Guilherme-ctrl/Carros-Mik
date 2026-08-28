@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Instale o app do motorista — Gincana Mik Dundee">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img,svg{display:block;max-width:100%}</style>
+</head>
+<body>
+<title>Instalar o App do Motorista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@500;600&display=swap">
+
+<style>
+:root{
+  --around:#E8E4EE;
+  --paper:#FFFFFF;
+  --ink:#14101B;
+  --ink-2:#4A4358;
+  --ink-3:#7C7490;
+  --rule:#DED8E6;
+  --pink:#E91E8C;
+  --pink-deep:#B5146D;
+  --pink-tint:#FDE9F4;
+  --ios:#1F5AB0;
+  --ios-tint:#EAF1FC;
+  --android:#15803D;
+  --android-tint:#E8F6EC;
+  --warn:#9A5A00;
+  --warn-tint:#FDF3E2;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --around:#0D0D18; }
+}
+:root[data-theme="dark"]{ --around:#0D0D18; }
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--around);
+  font-family:Inter, ui-sans-serif, system-ui, sans-serif;
+  color:var(--ink);
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+  display:flex;
+  justify-content:center;
+  padding:24px 16px;
+}
+h1,h2,h3{font-family:Poppins, Inter, sans-serif; margin:0; line-height:1.1; text-wrap:balance}
+p{margin:0}
+
+.sheet{
+  width:210mm;
+  min-height:297mm;
+  max-width:100%;
+  background:var(--paper);
+  padding:11mm 12mm;
+  display:flex;
+  flex-direction:column;
+  gap:4mm;
+  box-shadow:0 20px 60px -30px rgba(0,0,0,.6);
+  border-radius:3px;
+}
+
+/* ---------- cabeçalho ---------- */
+.head{display:flex; align-items:center; gap:14px; padding-bottom:3.5mm; border-bottom:3px solid var(--pink)}
+.head svg{width:74px; height:auto; flex:0 0 auto; border-radius:8px}
+.head .t{display:flex; flex-direction:column; gap:3px}
+.kicker{
+  font-family:"Fira Code", monospace; font-size:10px; font-weight:600;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--pink-deep);
+}
+.head h1{font-size:31px; font-weight:800; letter-spacing:-.02em}
+.head .sub{font-size:13.5px; color:var(--ink-2); max-width:60ch}
+
+/* ---------- como o app chega ---------- */
+.invite{
+  display:flex; gap:14px; align-items:stretch;
+  background:var(--pink-tint); border:1.5px solid var(--pink);
+  border-radius:11px; padding:9px 13px;
+}
+.inv-side{flex:1; display:flex; flex-direction:column; gap:3px; justify-content:center}
+.inv-side + .inv-side{border-left:1px solid rgba(233,30,140,.3); padding-left:14px}
+.inv-tag{
+  align-self:flex-start; font-family:"Fira Code",monospace; font-size:9px; font-weight:600;
+  letter-spacing:.12em; text-transform:uppercase; padding:2px 7px; border-radius:999px;
+}
+.inv-tag.i{background:var(--ios-tint); color:var(--ios)}
+.inv-tag.a{background:var(--android-tint); color:var(--android)}
+.invite p{font-size:12px; line-height:1.4; color:var(--ink)}
+.invite b{font-weight:700}
+.invite .lnk{font-family:"Fira Code",monospace; font-size:9.5px; color:var(--ink-2); word-break:break-all}
+.qr{
+  flex:0 0 auto; width:82px; height:82px; align-self:center;
+  background:#fff; border-radius:6px; padding:4px;
+}
+.qr svg{width:100%; height:100%; display:block}
+
+/* ---------- o susto do Android ---------- */
+.perigo{
+  display:flex; gap:12px; align-items:center;
+  background:#FDECEC; border:1.5px solid #C02626; border-radius:11px; padding:11px 14px;
+}
+.perigo .ic{font-size:22px; line-height:1; flex:0 0 auto}
+.perigo .tx{display:flex; flex-direction:column; gap:2px}
+.perigo b{font-family:Poppins,sans-serif; font-size:14px; font-weight:800; color:#C02626}
+.perigo span{font-size:11.5px; line-height:1.38; color:var(--ink)}
+
+/* ---------- as duas colunas ---------- */
+.cols{display:grid; grid-template-columns:1fr 1fr; gap:5mm}
+.col{border:1.5px solid var(--rule); border-radius:12px; overflow:hidden; display:flex; flex-direction:column}
+.col .cap{
+  padding:9px 14px; display:flex; align-items:center; gap:9px;
+  font-family:Poppins,sans-serif; font-weight:700; font-size:16px;
+}
+.col .cap .badge{
+  font-family:"Fira Code", monospace; font-size:9px; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase; padding:3px 8px;
+  border-radius:999px; background:rgba(255,255,255,.75);
+}
+.col.ios .cap{background:var(--ios-tint); color:var(--ios); border-bottom:1.5px solid var(--rule)}
+.col.and .cap{background:var(--android-tint); color:var(--android); border-bottom:1.5px solid var(--rule)}
+.col ol{
+  margin:0; padding:10px 13px; list-style:none;
+  display:flex; flex-direction:column; gap:8px; counter-reset:p; flex:1;
+}
+.col li{
+  counter-increment:p; display:grid; grid-template-columns:22px 1fr; gap:10px; align-items:start;
+}
+.col li::before{
+  content:counter(p);
+  font-family:"Fira Code", monospace; font-size:11px; font-weight:600;
+  width:22px; height:22px; border-radius:7px; display:grid; place-items:center;
+  color:#fff;
+}
+.col.ios li::before{background:var(--ios)}
+.col.and li::before{background:var(--android)}
+.col li .tx{display:flex; flex-direction:column; gap:2px}
+.col li b{font-size:12.5px; font-weight:650; line-height:1.2}
+.col li span{font-size:11.5px; line-height:1.35; color:var(--ink-2)}
+
+/* ---------- primeira vez ---------- */
+.first{border:1.5px solid var(--rule); border-radius:12px; padding:11px 14px; display:flex; flex-direction:column; gap:8px}
+.first h2{font-size:17px; font-weight:800}
+.first .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+.first .box{display:flex; flex-direction:column; gap:3px}
+.first .box .n{
+  font-family:"Fira Code", monospace; font-size:9px; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+}
+.first .box b{font-size:13px; font-weight:650}
+.first .box span{font-size:11px; line-height:1.35; color:var(--ink-2)}
+
+/* ---------- regra de ouro ---------- */
+.golden{
+  display:flex; gap:12px; align-items:center;
+  background:var(--warn-tint); border:1.5px solid var(--warn);
+  border-radius:12px; padding:11px 14px; margin-top:auto;
+}
+.golden .ic{font-size:23px; line-height:1}
+.golden .tx{display:flex; flex-direction:column; gap:3px}
+.golden b{font-family:Poppins,sans-serif; font-size:16px; font-weight:800; color:var(--warn)}
+.golden span{font-size:12.5px; line-height:1.45; color:var(--ink)}
+
+/* ---------- rodapé ---------- */
+.foot-bar{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding-top:4mm; border-top:1px solid var(--rule);
+  font-size:11px; color:var(--ink-3);
+}
+.foot-bar .fill{flex:1; border-bottom:1px solid var(--ink-3); min-width:80px; height:14px}
+
+@media print{
+  @page{ size:A4; margin:0 }
+  body{background:#fff; padding:0; display:block}
+  .sheet{box-shadow:none; border-radius:0; width:auto; min-height:auto}
+}
+@media screen and (max-width:800px){
+  body{padding:12px 8px}
+  .sheet{padding:16px 14px; gap:16px}
+  .cols{grid-template-columns:1fr}
+  .first .grid{grid-template-columns:1fr}
+  .head{flex-wrap:wrap}
+}
+</style>
+
+<div class="sheet">
+
+  <header class="head">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 90" role="img" aria-label="Jacaré Mik Dundee">
+      <rect width="180" height="90" rx="14" fill="#ffe4f1"/>
+      <g transform="translate(10,10)">
+        <path d="M10 40c30-25 60-25 90 0 10 8 30-5 40 6-12 8-28 4-33 8-4 4-8 8-20 8H30c-8 0-20-10-20-22z" fill="#00a862"/>
+        <circle cx="36" cy="30" r="8" fill="#fff"/><circle cx="36" cy="30" r="3" fill="#222"/>
+        <circle cx="52" cy="28" r="6" fill="#fff"/><circle cx="52" cy="28" r="2.5" fill="#222"/>
+        <path d="M15 45h35c3 0 5 2 5 5v3H10v-3c0-3 2-5 5-5z" fill="#e0ffd8"/>
+        <path d="M132 44l14-6 8 6-8 6z" fill="#007a49"/>
+      </g>
+    </svg>
+    <div class="t">
+      <span class="kicker">Carros de apoio · Gincana Mik Dundee</span>
+      <h1>Instale o app do motorista</h1>
+      <span class="sub">Cinco minutos, uma vez só. Faça antes do dia da gincana.</span>
+    </div>
+  </header>
+
+  <div class="invite">
+    <div class="inv-side">
+      <span class="inv-tag i">iPhone</span>
+      <p>O convite chega no <b>seu e-mail</b>. Se não achar, olhe no spam e avise a Mesa Central.</p>
+    </div>
+    <div class="inv-side">
+      <span class="inv-tag a">Android</span>
+      <p><b>Não precisa de convite.</b> Aponte a câmera no código ao lado.</p>
+      <span class="lnk">appdistribution.firebase.dev/i/307b4f9e463fa4e8</span>
+    </div>
+    <div class="qr" aria-label="QR Code para instalar no Android">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 41 41" shape-rendering="crispEdges" role="img" aria-label="QR Code do link de instalação Android"><path stroke="#000000" d="M0 0.5h7m4 0h1m4 0h1m1 0h2m1 0h2m2 0h2m3 0h2m2 0h7M0 1.5h1m5 0h1m3 0h1m2 0h2m2 0h2m1 0h1m2 0h1m1 0h1m3 0h2m3 0h1m5 0h1M0 2.5h1m1 0h3m1 0h1m3 0h1m2 0h1m2 0h2m9 0h2m2 0h1m2 0h1m1 0h3m1 0h1M0 3.5h1m1 0h3m1 0h1m2 0h1m1 0h1m2 0h1m4 0h2m1 0h3m1 0h2m1 0h1m1 0h1m2 0h1m1 0h3m1 0h1M0 4.5h1m1 0h3m1 0h1m1 0h2m2 0h1m1 0h2m2 0h2m1 0h2m1 0h6m1 0h2m1 0h1m1 0h3m1 0h1M0 5.5h1m5 0h1m6 0h1m2 0h1m5 0h2m1 0h2m4 0h1m2 0h1m5 0h1M0 6.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M8 7.5h1m1 0h1m5 0h2m1 0h1m2 0h1m1 0h1m3 0h4M2 8.5h2m2 0h7m3 0h1m1 0h1m1 0h1m8 0h2m2 0h2m1 0h1M1 9.5h1m2 0h1m2 0h4m2 0h1m2 0h2m2 0h4m1 0h2m1 0h2m1 0h6m1 0h1m1 0h1M0 10.5h1m2 0h1m1 0h2m1 0h1m1 0h2m4 0h2m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h1M0 11.5h2m2 0h1m2 0h1m1 0h3m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h1m3 0h1m2 0h1M1 12.5h2m3 0h1m1 0h2m4 0h4m1 0h1m6 0h1m1 0h2m1 0h3m1 0h1m1 0h2M0 13.5h3m1 0h2m5 0h2m1 0h4m1 0h2m1 0h1m1 0h1m6 0h4m3 0h3M0 14.5h2m1 0h1m1 0h2m1 0h1m1 0h1m2 0h2m1 0h1m2 0h3m3 0h2m2 0h4m1 0h2m1 0h4M0 15.5h1m1 0h2m3 0h1m1 0h1m1 0h2m2 0h1m3 0h2m1 0h3m1 0h2m6 0h4M1 16.5h4m1 0h1m1 0h2m1 0h2m4 0h5m2 0h1m7 0h1m3 0h1M2 17.5h1m2 0h1m4 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h1m1 0h3m2 0h1m1 0h2m1 0h1m1 0h1m1 0h1M2 18.5h9m2 0h2m1 0h3m1 0h2m2 0h2m1 0h2m3 0h1m3 0h3M1 19.5h4m3 0h1m1 0h1m1 0h2m1 0h6m2 0h3m1 0h5m3 0h1m1 0h2M3 20.5h1m2 0h2m2 0h1m2 0h1m1 0h2m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m3 0h8M1 21.5h1m3 0h1m3 0h1m1 0h2m1 0h2m1 0h2m1 0h1m3 0h1m1 0h1m1 0h1m2 0h4m1 0h1m1 0h3M1 22.5h2m1 0h4m1 0h5m2 0h1m1 0h2m2 0h1m6 0h1m3 0h1m1 0h1m1 0h3M1 23.5h1m1 0h2m2 0h1m1 0h2m2 0h1m2 0h1m3 0h2m1 0h2m2 0h2m3 0h4m3 0h1M0 24.5h2m1 0h4m3 0h2m2 0h3m4 0h1m1 0h1m1 0h3m1 0h1m1 0h1m6 0h1M1 25.5h3m1 0h1m1 0h2m1 0h1m2 0h1m2 0h1m3 0h2m3 0h1m1 0h8m2 0h2m1 0h1M0 26.5h1m4 0h4m2 0h2m1 0h2m1 0h3m3 0h2m3 0h5m1 0h1m1 0h2m1 0h2M0 27.5h1m2 0h2m3 0h4m6 0h3m1 0h1m1 0h1m1 0h3m1 0h3m1 0h2m1 0h1m1 0h1M0 28.5h2m2 0h1m1 0h1m3 0h2m1 0h2m1 0h1m1 0h1m2 0h3m2 0h1m3 0h4m2 0h2m1 0h1M1 29.5h1m1 0h1m1 0h1m3 0h3m1 0h6m2 0h4m1 0h1m5 0h1m2 0h1m1 0h2M0 30.5h1m1 0h2m2 0h2m1 0h2m1 0h4m1 0h2m4 0h1m2 0h1m2 0h2m2 0h2m2 0h1M2 31.5h1m2 0h1m11 0h4m1 0h3m2 0h5m2 0h2m1 0h2m1 0h1M1 32.5h1m3 0h4m1 0h4m2 0h4m4 0h1m2 0h1m1 0h1m1 0h8m1 0h1M8 33.5h10m4 0h1m1 0h1m4 0h1m2 0h1m3 0h2m2 0h1M0 34.5h7m1 0h1m3 0h1m1 0h2m1 0h1m1 0h3m3 0h1m3 0h1m1 0h2m1 0h1m1 0h4M0 35.5h1m5 0h1m2 0h1m2 0h2m4 0h2m2 0h1m1 0h2m2 0h1m2 0h2m3 0h2m1 0h1M0 36.5h1m1 0h3m1 0h1m2 0h2m3 0h1m1 0h2m4 0h1m2 0h1m1 0h2m1 0h1m1 0h5m1 0h2M0 37.5h1m1 0h3m1 0h1m1 0h3m1 0h2m1 0h2m3 0h3m1 0h6m6 0h5M0 38.5h1m1 0h3m1 0h1m1 0h1m2 0h1m4 0h3m1 0h1m1 0h3m10 0h1m4 0h1M0 39.5h1m5 0h1m4 0h2m3 0h3m2 0h2m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1m2 0h1M0 40.5h7m2 0h1m3 0h2m1 0h4m2 0h3m2 0h1m2 0h4m3 0h1m1 0h1"/>
+</svg>
+    </div>
+  </div>
+
+  <section class="cols">
+
+    <article class="col ios">
+      <div class="cap">iPhone <span class="badge">TestFlight</span></div>
+      <ol>
+        <li><div class="tx"><b>Instale o TestFlight</b><span>Na App Store, procure por “TestFlight”. É um app azul da própria Apple.</span></div></li>
+        <li><div class="tx"><b>Aceite o primeiro e-mail</b><span>Chega um convite da Apple. Toque em aceitar e entre com o seu Apple ID — o mesmo do seu iPhone.</span></div></li>
+        <li><div class="tx"><b>Abra o segundo e-mail</b><span>Este vem do TestFlight, depois do primeiro. Abra no iPhone e toque em <b>View in TestFlight</b>.</span></div></li>
+        <li><div class="tx"><b>Toque em Instalar</b><span>O ícone do jacaré aparece na sua tela de início.</span></div></li>
+        <li><div class="tx"><b>Versão nova?</b><span>O TestFlight avisa. Abra e toque em <b>Atualizar</b>.</span></div></li>
+      </ol>
+    </article>
+
+    <article class="col and">
+      <div class="cap">Android <span class="badge">pelo link</span></div>
+      <ol>
+        <li><div class="tx"><b>Aponte a câmera no QR Code</b><span>O de cima, nesta folha. Ou digite o endereço no navegador do celular.</span></div></li>
+        <li><div class="tx"><b>Entre com a sua conta Google</b><span>A tela de login do Google aparece logo de cara. É normal.</span></div></li>
+        <li><div class="tx"><b>Aceite o convite</b><span>Você entra no grupo de testes e a página passa a mostrar o app Carros Mik Dundee.</span></div></li>
+        <li><div class="tx"><b>Baixe e instale</b><span>O Android vai pedir permissão para instalar de fonte desconhecida — leia a caixa vermelha abaixo antes.</span></div></li>
+        <li><div class="tx"><b>Versão nova?</b><span>Volte no mesmo link e baixe de novo. Instala por cima, sem perder nada.</span></div></li>
+      </ol>
+    </article>
+
+  </section>
+
+  <div class="perigo">
+    <span class="ic">🛑</span>
+    <div class="tx">
+      <b>Android: vai aparecer uma tela vermelha escrita “Perigo”. Continue.</b>
+      <span>É a tela padrão do Android para qualquer app que não vem da Play Store — e o nosso não vem. O botão OK fica travado alguns segundos de propósito. Marque <b>“Estou ciente dos possíveis riscos”</b> e toque em <b>OK</b>. Desistir aqui é não instalar o app.</span>
+    </div>
+  </div>
+
+  <section class="first">
+    <h2>Ao abrir o app pela primeira vez</h2>
+    <div class="grid">
+      <div class="box">
+        <span class="n">Passo 1</span>
+        <b>Entre com e-mail e senha</b>
+        <span>Os que a Mesa Central te passou. Só uma vez — depois o app já abre logado.</span>
+      </div>
+      <div class="box">
+        <span class="n">Passo 2</span>
+        <b>Permitir localização</b>
+        <span>Toque em <b>Permitir</b>. Sem isso a Mesa Central não te enxerga no mapa.</span>
+      </div>
+      <div class="box">
+        <span class="n">Passo 3</span>
+        <b>Permitir notificações</b>
+        <span>Toque em <b>Permitir</b>. É assim que você fica sabendo de uma missão nova.</span>
+      </div>
+    </div>
+    <p style="font-size:12.5px; color:var(--ink-2); line-height:1.45">
+      Deu certo se você chegar numa tela escura escrita <b>“Aguardando tiro...”</b>. Se aparecer
+      <b>“Carro não configurado para este usuário”</b>, o login está certo — falta a Mesa Central
+      ligar você ao seu carro. Avise.
+    </p>
+  </section>
+
+  <section class="golden">
+    <span class="ic">📍</span>
+    <div class="tx">
+      <b>A regra de ouro: deixe o app aberto</b>
+      <span>Sua posição só é enviada com o app aberto na tela. Se minimizar ou bloquear o celular, seu carro congela no mapa da Mesa Central e você deixa de ser escolhido para as missões perto de você. Deixe o celular no suporte, app aberto.</span>
+    </div>
+  </section>
+
+  <footer class="foot-bar">
+    <span>Problema para instalar? Fale com a Mesa Central antes do dia do evento.</span>
+    <span>Contato:</span><span class="fill"></span>
+  </footer>
+
+</div>
+
+</body>
+</html>

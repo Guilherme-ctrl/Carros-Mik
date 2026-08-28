@@ -1,0 +1,1410 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Manual dos Carros de Apoio — Gincana Mik Dundee">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img,svg{display:block;max-width:100%}</style>
+</head>
+<body>
+<title>Manual Mik Dundee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap">
+
+<style>
+/* ============================================================
+   TOKENS — tema claro é o padrão (bare :root)
+   ============================================================ */
+:root{
+  --paper:#F6F4F8;
+  --paper-2:#EDE9F2;
+  --card:#FFFFFF;
+  --ink:#191323;
+  --ink-2:#4C4459;
+  --ink-3:#7A7290;
+  --rule:#E2DDE9;
+  --rule-2:#CFC8D9;
+  --accent:#E91E8C;
+  --accent-ink:#B5146D;
+  --accent-tint:#FCE9F3;
+  --pin-fg:#FFFFFF;
+  --ok-ink:#15803D;
+  --shadow:0 1px 2px rgba(25,19,35,.05), 0 10px 30px -18px rgba(25,19,35,.35);
+
+  --r-driver:#E91E8C;      --r-driver-ink:#B5146D;
+  --r-leader:#2F6FD0;      --r-leader-ink:#1F5AB0;
+  --r-central:#B26A00;     --r-central-ink:#8A5200;
+  --r-admin:#6D46C4;       --r-admin-ink:#5836A6;
+
+  /* Cores DO APP — idênticas nos dois temas: o app é escuro sempre */
+  --app-0:#0D0D18; --app-1:#16162A; --app-2:#21213A; --app-3:#2D2D4E;
+  --app-fg:#F2F2F2; --app-muted:#8A8AB0; --app-dis:#44445A;
+  --pink:#E91E8C; --pink-light:#FF4DB2; --pink-muted:#3D0A25;
+  --ok:#22C55E;   --ok-bg:#0D2E1A;
+  --warn:#F59E0B; --warn-bg:#2E1F05;
+  --bad:#EF4444;  --bad-bg:#2E0808;
+  --info:#60A5FA; --info-bg:#0A1829;
+  --done:#A78BFA; --done-bg:#150D2E;
+}
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D0D18;
+    --paper-2:#12121F;
+    --card:#16162A;
+    --ink:#F2F2F2;
+    --ink-2:#C3C0DA;
+    --ink-3:#8A8AB0;
+    --rule:#2D2D4E;
+    --rule-2:#3A3A5E;
+    --accent:#FF4DB2;
+    --accent-ink:#FF7BC6;
+    --accent-tint:#3D0A25;
+    --pin-fg:#2A0714;
+    --ok-ink:#4ADE80;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 34px -20px rgba(0,0,0,.8);
+
+    --r-driver:#FF4DB2;   --r-driver-ink:#FF7BC6;
+    --r-leader:#60A5FA;   --r-leader-ink:#8CBEFC;
+    --r-central:#F59E0B;  --r-central-ink:#FBBF4E;
+    --r-admin:#A78BFA;    --r-admin-ink:#C0ACFC;
+  }
+}
+
+:root[data-theme="dark"]{
+  --paper:#0D0D18;
+  --paper-2:#12121F;
+  --card:#16162A;
+  --ink:#F2F2F2;
+  --ink-2:#C3C0DA;
+  --ink-3:#8A8AB0;
+  --rule:#2D2D4E;
+  --rule-2:#3A3A5E;
+  --accent:#FF4DB2;
+  --accent-ink:#FF7BC6;
+  --accent-tint:#3D0A25;
+  --pin-fg:#2A0714;
+  --ok-ink:#4ADE80;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 34px -20px rgba(0,0,0,.8);
+
+  --r-driver:#FF4DB2;   --r-driver-ink:#FF7BC6;
+  --r-leader:#60A5FA;   --r-leader-ink:#8CBEFC;
+  --r-central:#F59E0B;  --r-central-ink:#FBBF4E;
+  --r-admin:#A78BFA;    --r-admin-ink:#C0ACFC;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:Poppins, Inter, sans-serif; text-wrap:balance; margin:0; line-height:1.15}
+p{margin:0}
+a{color:var(--accent-ink); text-underline-offset:3px}
+a:focus-visible, button:focus-visible, summary:focus-visible{
+  outline:2px solid var(--accent); outline-offset:3px; border-radius:4px;
+}
+strong{font-weight:650; color:var(--ink)}
+code, .mono{font-family:"Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace}
+
+.wrap{max-width:1180px; margin:0 auto; padding:0 20px}
+
+/* ============================================================
+   CAPA
+   ============================================================ */
+.hero{
+  border-bottom:1px solid var(--rule);
+  background:
+    radial-gradient(1100px 380px at 78% -10%, var(--accent-tint), transparent 62%),
+    var(--paper-2);
+}
+.hero-in{
+  display:flex; flex-wrap:wrap; align-items:center; gap:32px;
+  padding-block:48px 44px;
+}
+.hero-mark{width:132px; flex:0 0 auto}
+.hero-mark svg{width:100%; height:auto; display:block; border-radius:12px}
+.hero-txt{flex:1 1 380px; display:flex; flex-direction:column; gap:14px}
+.eyebrow{
+  font-family:"Fira Code", monospace; font-size:11.5px; font-weight:600;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--accent-ink);
+}
+.hero h1{font-size:clamp(34px,6vw,54px); font-weight:800; letter-spacing:-.02em}
+.hero-sub{font-size:18px; color:var(--ink-2); max-width:58ch}
+.hero-meta{
+  display:flex; flex-wrap:wrap; gap:8px; margin-top:4px;
+}
+.tag{
+  font-family:"Fira Code", monospace; font-size:11px; font-weight:500;
+  padding:5px 10px; border-radius:999px;
+  border:1px solid var(--rule-2); color:var(--ink-2); background:var(--card);
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.layout{display:grid; grid-template-columns:1fr; gap:36px; padding-block:34px 80px}
+@media (min-width:1000px){
+  .layout{grid-template-columns:224px minmax(0,1fr); gap:56px}
+}
+
+.toc{align-self:start}
+@media (min-width:1000px){ .toc{position:sticky; top:22px} }
+.toc-title{display:none}
+@media (min-width:1000px){
+  .toc-title{
+    display:block;
+    font-family:"Fira Code", monospace; font-size:11px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--ink-3); margin-bottom:10px;
+  }
+}
+.toc ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:1px}
+.toc a{
+  display:flex; gap:10px; align-items:baseline;
+  padding:6px 10px; border-radius:7px; text-decoration:none;
+  color:var(--ink-2); font-size:13.5px; line-height:1.35;
+  border-left:2px solid transparent;
+}
+.toc a:hover{background:var(--card); color:var(--ink); border-left-color:var(--accent)}
+.toc a .n{font-family:"Fira Code", monospace; font-size:11px; color:var(--ink-3); flex:0 0 auto}
+.toc details summary{
+  cursor:pointer; font-family:"Fira Code", monospace; font-size:12px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);
+  padding:10px 0; list-style:none;
+}
+.toc details summary::-webkit-details-marker{display:none}
+.toc details summary::after{content:" ▾"}
+@media (min-width:1000px){
+  .toc details{display:block}
+  .toc details summary{display:none}
+  .toc details[open] > *{display:block}
+}
+
+.content{display:flex; flex-direction:column; gap:56px; min-width:0}
+
+/* ============================================================
+   SEÇÕES
+   ============================================================ */
+section{display:flex; flex-direction:column; gap:20px; scroll-margin-top:20px}
+.sec-head{display:flex; flex-direction:column; gap:8px; padding-bottom:14px; border-bottom:2px solid var(--rule)}
+.sec-n{
+  font-family:"Fira Code", monospace; font-size:12px; font-weight:600;
+  letter-spacing:.14em; color:var(--accent-ink);
+}
+.sec-head h2{font-size:clamp(24px,3.4vw,32px); font-weight:700; letter-spacing:-.015em}
+.sec-head p{color:var(--ink-2); max-width:66ch}
+
+h3{font-size:20px; font-weight:700; margin-top:8px}
+h4{font-size:15.5px; font-weight:600; color:var(--ink)}
+.lead{font-size:17px; color:var(--ink-2); max-width:66ch}
+.body-txt{max-width:68ch; color:var(--ink-2)}
+.body-txt + .body-txt{margin-top:-8px}
+
+/* ============================================================
+   CARDS / BLOCOS
+   ============================================================ */
+.card{
+  background:var(--card); border:1px solid var(--rule);
+  border-radius:14px; padding:20px; box-shadow:var(--shadow);
+  display:flex; flex-direction:column; gap:12px;
+}
+.grid-2{display:grid; grid-template-columns:1fr; gap:16px}
+@media (min-width:720px){ .grid-2{grid-template-columns:1fr 1fr} }
+.grid-4{display:grid; grid-template-columns:1fr; gap:16px}
+@media (min-width:620px){ .grid-4{grid-template-columns:1fr 1fr} }
+@media (min-width:1080px){ .grid-4{grid-template-columns:repeat(4,1fr)} }
+
+/* o endereco real do sistema */
+.linkbox{
+  background:var(--card); border:1px solid var(--rule); border-left:4px solid var(--accent);
+  border-radius:14px; padding:20px 22px; box-shadow:var(--shadow);
+  display:flex; flex-direction:column; gap:9px;
+}
+.linkbox .lb-head{
+  font-family:"Fira Code", monospace; font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3);
+}
+.lb-url{
+  font-family:Poppins, sans-serif; font-weight:700; font-size:clamp(19px,3.4vw,27px);
+  color:var(--accent-ink); text-decoration:none; letter-spacing:-.01em; word-break:break-word;
+}
+.lb-url:hover{text-decoration:underline}
+.linkbox p{color:var(--ink-2); font-size:14.5px; max-width:62ch}
+
+/* avisos */
+.note, .warn, .tip{
+  border-radius:12px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start;
+  font-size:14.5px; line-height:1.55;
+}
+.note{background:var(--card); border:1px solid var(--rule); color:var(--ink-2)}
+.warn{background:color-mix(in srgb, var(--warn) 12%, var(--card)); border:1px solid color-mix(in srgb, var(--warn) 45%, transparent); color:var(--ink)}
+.tip{background:color-mix(in srgb, var(--ok) 12%, var(--card)); border:1px solid color-mix(in srgb, var(--ok) 42%, transparent); color:var(--ink)}
+.note b, .warn b, .tip b{font-weight:650}
+.ic{flex:0 0 auto; font-size:16px; line-height:1.4}
+
+/* ============================================================
+   PAPÉIS
+   ============================================================ */
+.role{
+  background:var(--card); border:1px solid var(--rule); border-radius:14px;
+  padding:0; overflow:hidden; box-shadow:var(--shadow);
+  display:flex; flex-direction:column;
+}
+.role .bar{height:5px}
+.role .in{padding:18px; display:flex; flex-direction:column; gap:10px; flex:1}
+.role h4{font-family:Poppins, sans-serif; font-size:17px; font-weight:700}
+.role .where{
+  font-family:"Fira Code", monospace; font-size:10.5px; letter-spacing:.1em;
+  text-transform:uppercase; padding:4px 9px; border-radius:999px; align-self:flex-start;
+}
+.role ul{margin:0; padding-left:18px; color:var(--ink-2); font-size:14.5px; display:flex; flex-direction:column; gap:5px}
+.role .go{margin-top:auto; font-size:13px; font-weight:600}
+.r-driver .bar{background:var(--r-driver)}
+.r-driver .where{background:color-mix(in srgb, var(--r-driver) 15%, transparent); color:var(--r-driver-ink)}
+.r-leader .bar{background:var(--r-leader)}
+.r-leader .where{background:color-mix(in srgb, var(--r-leader) 15%, transparent); color:var(--r-leader-ink)}
+.r-central .bar{background:var(--r-central)}
+.r-central .where{background:color-mix(in srgb, var(--r-central) 18%, transparent); color:var(--r-central-ink)}
+.r-admin .bar{background:var(--r-admin)}
+.r-admin .where{background:color-mix(in srgb, var(--r-admin) 15%, transparent); color:var(--r-admin-ink)}
+
+/* ============================================================
+   PASSO A PASSO
+   ============================================================ */
+.steps{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; counter-reset:s}
+.steps li{
+  counter-increment:s;
+  display:grid; grid-template-columns:32px minmax(0,1fr); gap:14px; align-items:start;
+  background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:14px 16px;
+}
+.steps li::before{
+  content:counter(s);
+  font-family:"Fira Code", monospace; font-size:13px; font-weight:600;
+  width:32px; height:32px; border-radius:9px;
+  display:grid; place-items:center;
+  background:var(--accent); color:var(--pin-fg);
+}
+.steps .st{display:flex; flex-direction:column; gap:4px; min-width:0}
+.steps .st b{font-weight:650; font-size:15px}
+.steps .st span{color:var(--ink-2); font-size:14.5px}
+.steps .st .mono{font-size:13px}
+
+/* ============================================================
+   MOCKUPS — as "telas"
+   ============================================================ */
+.shot{display:flex; flex-direction:column; gap:14px}
+.shot-cap{
+  font-family:"Fira Code", monospace; font-size:11px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink-3);
+}
+.shot-row{display:flex; flex-wrap:wrap; gap:26px; align-items:flex-start}
+.shot-row > .legend{flex:1 1 260px; min-width:240px}
+
+.phone{
+  flex:0 0 auto; width:296px; max-width:100%;
+  background:#1B1B30; border:1px solid #33335A; border-radius:34px;
+  padding:9px; box-shadow:0 18px 40px -22px rgba(0,0,0,.7);
+}
+.screen{background:var(--app-0); border-radius:26px; overflow:hidden; color:var(--app-fg)}
+.notch{
+  height:26px; display:flex; align-items:center; justify-content:center;
+}
+.notch i{display:block; width:78px; height:16px; border-radius:999px; background:#000}
+
+.scroll-x{overflow-x:auto; padding-bottom:6px; -webkit-overflow-scrolling:touch}
+.scroll-x > .win{min-width:600px}
+.win{
+  flex:1 1 460px; min-width:290px;
+  border:1px solid #33335A; border-radius:12px; overflow:hidden;
+  background:var(--app-0); color:var(--app-fg);
+  box-shadow:0 18px 40px -24px rgba(0,0,0,.6);
+}
+.win-bar{
+  display:flex; align-items:center; gap:8px; padding:8px 12px;
+  background:#1B1B30; border-bottom:1px solid #2D2D4E;
+}
+.win-bar .dot{width:9px; height:9px; border-radius:999px; background:#3A3A5E}
+.win-bar .url{
+  margin-left:8px; flex:1; font-family:"Fira Code", monospace; font-size:10.5px;
+  color:var(--app-muted); background:#0D0D18; border:1px solid #2D2D4E;
+  border-radius:6px; padding:3px 9px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* tipografia interna dos mockups */
+.screen, .win{font-size:13px; line-height:1.45}
+.ui-pad{padding:12px}
+.ui-row{display:flex; align-items:center; gap:8px}
+.ui-lbl{
+  font-family:"Fira Code", monospace; font-size:9.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--app-dis);
+}
+.ui-muted{color:var(--app-muted); font-size:12px}
+.ui-title{font-family:Poppins, sans-serif; font-weight:700; font-size:16px}
+.ui-card{background:var(--app-1); border:1px solid var(--app-3); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:9px}
+.ui-sep{height:1px; background:var(--app-3); margin:2px 0}
+.ui-btn{
+  border-radius:9px; padding:9px 12px; text-align:center; font-weight:650; font-size:12.5px;
+  border:1.5px solid var(--pink); color:var(--pink-light); background:transparent;
+}
+.ui-btn.solid{background:var(--pink); color:#fff; border-color:var(--pink)}
+.ui-btn.green{border-color:var(--ok); color:var(--ok)}
+.ui-btn.greensolid{background:var(--ok); color:#08240F; border-color:var(--ok)}
+.ui-btn.ghost{border-color:var(--app-3); color:var(--app-muted)}
+.ui-btn.dim{background:var(--app-3); color:var(--app-dis); border-color:var(--app-3)}
+.ui-input{
+  background:var(--app-2); border:1px solid var(--app-3); border-radius:9px;
+  padding:8px 10px; color:var(--app-dis); font-size:12px;
+}
+.ui-field{display:flex; flex-direction:column; gap:3px}
+.ui-field .v{font-size:13px}
+
+.chip{
+  display:inline-flex; align-items:center; gap:6px;
+  border-radius:999px; padding:3px 9px;
+  font-family:"Fira Code", monospace; font-size:9.5px; font-weight:600;
+  letter-spacing:.08em; text-transform:uppercase; white-space:nowrap;
+}
+.chip .d{width:5px; height:5px; border-radius:999px; background:currentColor}
+.c-open{background:var(--info-bg); color:var(--info)}
+.c-review{background:var(--warn-bg); color:var(--warn)}
+.c-assigned{background:var(--done-bg); color:var(--done)}
+.c-done{background:var(--ok-bg); color:var(--ok)}
+.c-cancel{background:var(--bad-bg); color:var(--bad)}
+.c-free{background:var(--ok-bg); color:var(--ok)}
+.c-busy{background:var(--warn-bg); color:var(--warn)}
+.c-off{background:var(--app-2); color:var(--app-dis)}
+.c-na{background:var(--bad-bg); color:var(--bad)}
+.c-pink{background:var(--pink-muted); color:var(--pink-light); border:1px solid color-mix(in srgb, var(--pink) 40%, transparent)}
+
+.pin{
+  flex:0 0 auto; width:19px; height:19px; border-radius:999px;
+  background:var(--pink); color:#fff;
+  font-family:"Fira Code", monospace; font-size:10.5px; font-weight:600;
+  display:inline-grid; place-items:center; line-height:1;
+}
+.pin.on-doc{background:var(--accent); color:var(--pin-fg)}
+
+.legend{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px}
+.legend li{display:grid; grid-template-columns:19px minmax(0,1fr); gap:11px; align-items:start; font-size:14.5px}
+.legend b{font-weight:650}
+.legend span{color:var(--ink-2)}
+
+/* ============================================================
+   FLUXO DA MISSÃO
+   ============================================================ */
+.flow{
+  display:flex; gap:0; overflow-x:auto; padding:4px 2px 10px;
+  border:1px solid var(--rule); border-radius:14px; background:var(--card);
+}
+.flow-step{
+  flex:0 0 auto; width:172px; padding:16px 14px;
+  display:flex; flex-direction:column; gap:9px; align-items:flex-start;
+  border-right:1px dashed var(--rule);
+}
+.flow-step:last-child{border-right:0}
+.flow-step .who{
+  font-family:"Fira Code", monospace; font-size:9.5px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink-3);
+}
+.flow-step .st{font-family:Poppins, sans-serif; font-weight:700; font-size:15px}
+.flow-step .act{
+  font-size:12.5px; color:var(--ink-2);
+}
+.flow-step .btnface{
+  font-family:Inter, sans-serif; font-size:12px; font-weight:650;
+  background:var(--pink); color:#fff; border-radius:8px; padding:6px 12px;
+}
+.flow-step .btnface.g{background:var(--ok); color:#08240F}
+.flow-step .btnface.o{background:transparent; color:var(--accent-ink); border:1.5px solid var(--accent)}
+
+/* ============================================================
+   TABELAS
+   ============================================================ */
+.tbl-wrap{overflow-x:auto; border:1px solid var(--rule); border-radius:12px; background:var(--card)}
+table{border-collapse:collapse; width:100%; font-size:14px; min-width:520px}
+th, td{text-align:left; padding:11px 14px; border-bottom:1px solid var(--rule); vertical-align:top}
+th{
+  font-family:"Fira Code", monospace; font-size:10.5px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink-3); font-weight:600; background:var(--paper-2);
+}
+tr:last-child td{border-bottom:0}
+td.yes{color:var(--ok-ink); font-weight:700}
+td.no{color:var(--ink-3)}
+.tbl-wrap.center td:not(:first-child), .tbl-wrap.center th:not(:first-child){text-align:center}
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+.faq{display:flex; flex-direction:column; gap:10px}
+.faq details{
+  background:var(--card); border:1px solid var(--rule); border-radius:12px;
+  padding:0; overflow:hidden;
+}
+.faq summary{
+  cursor:pointer; padding:14px 18px; font-weight:600; font-size:15px;
+  list-style:none; display:flex; gap:12px; align-items:flex-start;
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"?"; font-family:"Fira Code",monospace; color:var(--accent-ink); font-weight:700; flex:0 0 auto}
+.faq details[open] summary{border-bottom:1px solid var(--rule)}
+.faq .ans{padding:14px 18px 16px 42px; color:var(--ink-2); font-size:14.5px; display:flex; flex-direction:column; gap:8px}
+
+/* ============================================================
+   CARTÃO DE BOLSO
+   ============================================================ */
+.pocket{
+  background:var(--app-0); color:var(--app-fg);
+  border:1px solid var(--app-3); border-radius:16px; padding:24px;
+  display:grid; grid-template-columns:1fr; gap:22px;
+}
+@media (min-width:760px){ .pocket{grid-template-columns:1fr 1fr} }
+.pocket h4{color:var(--app-fg); font-family:Poppins,sans-serif; font-size:14px; letter-spacing:.02em}
+.pocket ul{margin:0; padding-left:17px; color:var(--app-muted); font-size:13.5px; display:flex; flex-direction:column; gap:6px}
+.pocket b{color:var(--app-fg)}
+.pocket .blk{display:flex; flex-direction:column; gap:9px}
+
+footer{
+  border-top:1px solid var(--rule); padding-block:28px 46px;
+  color:var(--ink-3); font-size:13px; display:flex; flex-direction:column; gap:6px;
+}
+
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+@media print{
+  .toc{display:none}
+  .layout{grid-template-columns:1fr}
+  body{background:#fff; color:#000}
+}
+</style>
+
+<header class="hero">
+  <div class="wrap hero-in">
+    <div class="hero-mark">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 90" role="img" aria-label="Jacaré Mik Dundee">
+        <defs>
+          <linearGradient id="jac" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#00b66b"/>
+            <stop offset="1" stop-color="#007a49"/>
+          </linearGradient>
+        </defs>
+        <rect width="180" height="90" rx="14" fill="#ffe4f1"/>
+        <g transform="translate(10,10)">
+          <path d="M10 40c30-25 60-25 90 0 10 8 30-5 40 6-12 8-28 4-33 8-4 4-8 8-20 8H30c-8 0-20-10-20-22z" fill="url(#jac)"/>
+          <circle cx="36" cy="30" r="8" fill="#fff"/>
+          <circle cx="36" cy="30" r="3" fill="#222"/>
+          <circle cx="52" cy="28" r="6" fill="#fff"/>
+          <circle cx="52" cy="28" r="2.5" fill="#222"/>
+          <path d="M15 45h35c3 0 5 2 5 5v3H10v-3c0-3 2-5 5-5z" fill="#e0ffd8"/>
+          <path d="M28 53l3-5 3 5m6 0l3-5 3 5" stroke="#007a49" stroke-width="2" fill="none"/>
+          <path d="M132 44l14-6 8 6-8 6z" fill="#007a49"/>
+        </g>
+      </svg>
+    </div>
+    <div class="hero-txt">
+      <div class="eyebrow">Gincana Mik Dundee · Blumenau</div>
+      <h1>Manual dos Carros de Apoio</h1>
+      <p class="hero-sub">Como instalar o app, como abrir o sistema no computador, e o que cada pessoa faz durante a gincana. Feito para ser lido por quem nunca usou o sistema.</p>
+      <div class="hero-meta">
+        <span class="tag">Motorista</span>
+        <span class="tag">Líder de Mesa</span>
+        <span class="tag">Mesa Central</span>
+        <span class="tag">Administrador</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap layout">
+
+  <!-- ÍNDICE -->
+  <nav class="toc" aria-label="Índice">
+    <details open>
+      <summary>Índice</summary>
+      <div class="toc-title">Índice</div>
+      <ol>
+        <li><a href="#s1"><span class="n">1</span> Como funciona</a></li>
+        <li><a href="#s2"><span class="n">2</span> Qual é o seu papel</a></li>
+        <li><a href="#s3"><span class="n">3</span> Instalar o app</a></li>
+        <li><a href="#s4"><span class="n">4</span> Abrir no computador</a></li>
+        <li><a href="#s5"><span class="n">5</span> Manual do Motorista</a></li>
+        <li><a href="#s6"><span class="n">6</span> Manual do Líder</a></li>
+        <li><a href="#s7"><span class="n">7</span> Manual da Mesa Central</a></li>
+        <li><a href="#s8"><span class="n">8</span> Manual do Admin</a></li>
+        <li><a href="#s9"><span class="n">9</span> Cores e status</a></li>
+        <li><a href="#s10"><span class="n">10</span> Deu problema?</a></li>
+        <li><a href="#s11"><span class="n">11</span> Cartão de bolso</a></li>
+      </ol>
+    </details>
+  </nav>
+
+  <main class="content">
+
+    <!-- ======================= 1 ======================= -->
+    <section id="s1">
+      <div class="sec-head">
+        <div class="sec-n">01</div>
+        <h2>Como funciona, em 30 segundos</h2>
+        <p>Três pessoas, um caminho. É só isso que o sistema faz.</p>
+      </div>
+
+      <div class="flow" role="list" aria-label="Fluxo geral do sistema">
+        <div class="flow-step" role="listitem">
+          <div class="who">Líder de Mesa</div>
+          <div class="st">Abre o pedido</div>
+          <div class="act">Preenche um formulário: onde é, e o que precisa ser feito.</div>
+        </div>
+        <div class="flow-step" role="listitem">
+          <div class="who">Mesa Central</div>
+          <div class="st">Manda o carro</div>
+          <div class="act">Vê o pedido na fila e no mapa, e escolhe o carro mais próximo.</div>
+        </div>
+        <div class="flow-step" role="listitem">
+          <div class="who">Motorista</div>
+          <div class="st">Faz a missão</div>
+          <div class="act">Recebe no celular, abre o Maps, e vai. Vai marcando o que está fazendo.</div>
+        </div>
+        <div class="flow-step" role="listitem">
+          <div class="who">Motorista</div>
+          <div class="st">Reporta</div>
+          <div class="act">Marca <b>Achei</b> ou <b>Não achei</b> no final.</div>
+        </div>
+        <div class="flow-step" role="listitem">
+          <div class="who">Líder ou Mesa</div>
+          <div class="st">Encerra</div>
+          <div class="act">Confirma que resolveu. O carro fica livre para a próxima.</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4>O que o sistema faz sozinho</h4>
+          <ul style="margin:0; padding-left:18px; color:var(--ink-2); font-size:14.5px; display:flex; flex-direction:column; gap:6px">
+            <li>Avisa o motorista no celular assim que a missão é atribuída.</li>
+            <li>Mostra onde cada carro está no mapa, atualizando a cada 10 segundos.</li>
+            <li>Atualiza a tela de todo mundo na hora, sem precisar recarregar.</li>
+            <li>Guarda o histórico de tudo que aconteceu em cada missão.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Onde cada um usa</h4>
+          <ul style="margin:0; padding-left:18px; color:var(--ink-2); font-size:14.5px; display:flex; flex-direction:column; gap:6px">
+            <li><b>Motorista</b> — aplicativo no celular (iPhone ou Android).</li>
+            <li><b>Líder de Mesa</b> — site, no tablet ou notebook.</li>
+            <li><b>Mesa Central</b> — site, no computador (quanto maior a tela, melhor).</li>
+            <li><b>Administrador</b> — site, no computador.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= 2 ======================= -->
+    <section id="s2">
+      <div class="sec-head">
+        <div class="sec-n">02</div>
+        <h2>Qual é o seu papel?</h2>
+        <p>Cada pessoa recebe um login com um papel. O papel decide o que você vê na tela — ninguém precisa configurar nada.</p>
+      </div>
+
+      <div class="grid-4">
+        <div class="role r-driver">
+          <div class="bar"></div>
+          <div class="in">
+            <span class="where">App no celular</span>
+            <h4>Motorista</h4>
+            <ul>
+              <li>Recebe as missões</li>
+              <li>Navega até o local</li>
+              <li>Marca o andamento</li>
+              <li>Reporta Achei / Não achei</li>
+            </ul>
+            <a class="go" href="#s5">Ir para o manual →</a>
+          </div>
+        </div>
+        <div class="role r-leader">
+          <div class="bar"></div>
+          <div class="in">
+            <span class="where">Site</span>
+            <h4>Líder de Mesa</h4>
+            <ul>
+              <li>Abre solicitações</li>
+              <li>Acompanha o status</li>
+              <li>Fala com o carro</li>
+              <li>Encerra quando resolveu</li>
+            </ul>
+            <a class="go" href="#s6">Ir para o manual →</a>
+          </div>
+        </div>
+        <div class="role r-central">
+          <div class="bar"></div>
+          <div class="in">
+            <span class="where">Site</span>
+            <h4>Mesa Central</h4>
+            <ul>
+              <li>Vê o mapa e a fila</li>
+              <li>Manda os carros</li>
+              <li>Define prioridades</li>
+              <li>Cadastra líderes e carros</li>
+            </ul>
+            <a class="go" href="#s7">Ir para o manual →</a>
+          </div>
+        </div>
+        <div class="role r-admin">
+          <div class="bar"></div>
+          <div class="in">
+            <span class="where">Site</span>
+            <h4>Administrador</h4>
+            <ul>
+              <li>Tudo que a Mesa faz</li>
+              <li>Cria os usuários</li>
+              <li>Define os papéis</li>
+              <li>Chat privado com os carros</li>
+            </ul>
+            <a class="go" href="#s8">Ir para o manual →</a>
+          </div>
+        </div>
+      </div>
+
+      <h3>Quem pode fazer o quê</h3>
+      <div class="tbl-wrap center">
+        <table>
+          <thead>
+            <tr>
+              <th>Ação</th>
+              <th>Motorista</th>
+              <th>Líder</th>
+              <th>Mesa Central</th>
+              <th>Admin</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Abrir solicitação</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>Ver <b>todas</b> as solicitações</td><td class="no">—</td><td class="no">só as suas</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>Ver o mapa dos carros</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>Atribuir carro a uma missão</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>Mudar prioridade da fila</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>Executar a missão no app</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+            <tr><td>Reportar Achei / Não achei</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+            <tr><td>Encerrar a missão</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>Cancelar a própria solicitação</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>Cadastrar líderes e carros</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td>Criar usuários e senhas</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+            <tr><td>Chat privado com um carro</td><td class="yes">✓</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note"><span class="ic">ℹ️</span><div><b>Comentários são diferentes do chat.</b> Todo mundo que está numa missão (líder, carro e Mesa) vê os comentários daquela missão. Já o <b>Chat dos Carros</b> é uma conversa privada entre o Administrador e um carro só.</div></div>
+    </section>
+
+    <!-- ======================= 3 ======================= -->
+    <section id="s3">
+      <div class="sec-head">
+        <div class="sec-n">03</div>
+        <h2>Instalar o app — Motorista</h2>
+        <p>O app não está na App Store nem na Play Store. No iPhone ele chega por um convite no seu e-mail; no Android, por um link que você abre direto.</p>
+      </div>
+
+      <div class="linkbox">
+        <div class="lb-head">O site — Líder, Mesa Central e Administrador</div>
+        <a class="lb-url" href="https://carros-mik.vercel.app">carros-mik.vercel.app</a>
+        <p>Abre em qualquer navegador, no computador ou no tablet. Não instala nada. O app do celular é só para o motorista.</p>
+      </div>
+
+      <h3>iPhone — pelo TestFlight</h3>
+
+      <ol class="steps">
+        <li><div class="st"><b>Instale o TestFlight</b><span>Abra a App Store, procure por <span class="mono">TestFlight</span> e instale. É um app azul da própria Apple.</span></div></li>
+        <li><div class="st"><b>Aceite o primeiro e-mail</b><span>Chega um convite da Apple. Toque em aceitar e entre com o seu <b>Apple ID</b> — o mesmo do seu iPhone.</span></div></li>
+        <li><div class="st"><b>Abra o segundo e-mail, do TestFlight</b><span>Ele chega depois do primeiro. Abra <b>no iPhone</b> e toque em <b>View in TestFlight</b>.</span></div></li>
+        <li><div class="st"><b>Toque em “Instalar”</b><span>O ícone do jacaré aparece na sua tela de início, como qualquer outro app.</span></div></li>
+        <li><div class="st"><b>Quando sair versão nova</b><span>O TestFlight avisa. Abra o TestFlight e toque em <b>Atualizar</b>. Use sempre a versão mais nova.</span></div></li>
+      </ol>
+
+      <h3>Android — pelo link</h3>
+      <p class="body-txt">No Android não tem convite nem espera: é abrir um link e instalar. A Mesa Central passa o link no grupo, e ele também está no folder de instalação, com um QR Code.</p>
+
+      <ol class="steps">
+        <li><div class="st"><b>Abra o link no próprio Android</b><span>Aponte a câmera para o QR Code do folder, ou toque no link que a Mesa Central mandou. Abrir no computador não resolve.</span></div></li>
+        <li><div class="st"><b>Entre com a sua conta Google</b><span>A tela de login do Google aparece logo de cara — é o primeiro passo, e é normal.</span></div></li>
+        <li><div class="st"><b>Aceite o convite</b><span>Você entra no grupo de testes e a página passa a mostrar o app <b>Carros Mik Dundee</b>.</span></div></li>
+        <li><div class="st"><b>Baixe e instale</b><span>O Android pede permissão para instalar de fonte desconhecida. Leia o aviso abaixo antes — ele assusta.</span></div></li>
+        <li><div class="st"><b>Quando sair versão nova</b><span>Volte no mesmo link e baixe de novo. Instala por cima, sem perder nada.</span></div></li>
+      </ol>
+
+      <div class="warn"><span class="ic">🛑</span><div><b>No Android vai aparecer uma tela vermelha escrita “Perigo”. Continue.</b> O aviso fala em “instalar apps perigosos” e o botão <b>OK</b> fica travado por alguns segundos de propósito. É a tela padrão do Android para qualquer app que não vem da Play Store — e o nosso não vem. Marque <b>“Estou ciente dos possíveis riscos”</b> e toque em <b>OK</b>. É aqui que a maioria das pessoas desiste e fica sem o app.</div></div>
+
+      <div class="warn"><span class="ic">⏰</span><div><b>Instale e faça login antes do dia da gincana.</b> São dois e-mails no iPhone e uma instalação no Android — nada difícil, mas nada que você queira estar resolvendo com o carro já na rua. Abra o app uma vez, faça login e confirme que apareceu a tela “Aguardando tiro...”.</div></div>
+
+      <h3>Primeira vez que abrir o app</h3>
+      <div class="shot-row">
+        <div class="phone">
+          <div class="screen">
+            <div class="notch"><i></i></div>
+            <div class="ui-pad" style="display:flex; flex-direction:column; gap:16px; padding:28px 20px 30px; align-items:center; text-align:center">
+              <svg viewBox="0 0 180 90" width="118" height="59" aria-hidden="true">
+                <rect width="180" height="90" rx="14" fill="#ffe4f1"/>
+                <g transform="translate(10,10)">
+                  <path d="M10 40c30-25 60-25 90 0 10 8 30-5 40 6-12 8-28 4-33 8-4 4-8 8-20 8H30c-8 0-20-10-20-22z" fill="#00a862"/>
+                  <circle cx="36" cy="30" r="8" fill="#fff"/><circle cx="36" cy="30" r="3" fill="#222"/>
+                  <circle cx="52" cy="28" r="6" fill="#fff"/><circle cx="52" cy="28" r="2.5" fill="#222"/>
+                  <path d="M15 45h35c3 0 5 2 5 5v3H10v-3c0-3 2-5 5-5z" fill="#e0ffd8"/>
+                  <path d="M132 44l14-6 8 6-8 6z" fill="#007a49"/>
+                </g>
+              </svg>
+              <div style="display:flex; flex-direction:column; gap:2px">
+                <div class="ui-title" style="font-size:22px">Mik Dundee</div>
+                <div class="ui-muted">Carros de apoio</div>
+              </div>
+              <div style="width:100%; display:flex; flex-direction:column; gap:10px; margin-top:6px">
+                <div class="ui-input ui-row"><span style="flex:1">Email</span><span class="pin">1</span></div>
+                <div class="ui-input ui-row"><span style="flex:1">Senha</span><span class="pin">2</span></div>
+                <div class="ui-btn solid ui-row" style="justify-content:center; gap:8px">Entrar <span class="pin" style="background:rgba(0,0,0,.35)">3</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="legend">
+          <li><span class="pin">1</span><div><b>Email</b><br><span>O mesmo que a Mesa Central cadastrou para você.</span></div></li>
+          <li><span class="pin">2</span><div><b>Senha</b><br><span>A senha temporária que te passaram. Se não souber, peça para a Mesa Central gerar outra.</span></div></li>
+          <li><span class="pin">3</span><div><b>Entrar</b><br><span>Você só faz isso uma vez. Depois o app já abre logado.</span></div></li>
+          <li><span class="pin on-doc">4</span><div><b>Permitir localização</b><br><span>O celular vai perguntar. Toque em <b>Permitir</b> — sem isso a Mesa Central não te vê no mapa.</span></div></li>
+          <li><span class="pin on-doc">5</span><div><b>Permitir notificações</b><br><span>Toque em <b>Permitir</b> também. É assim que você fica sabendo de uma missão nova.</span></div></li>
+        </ol>
+      </div>
+
+      <div class="warn"><span class="ic">📍</span><div><b>Deixe o app aberto na tela enquanto estiver rodando.</b> A sua posição só é enviada quando o app está aberto. Se você minimizar ou bloquear o celular, o seu carro para de se mexer no mapa da Mesa Central — e você pode deixar de ser escolhido para uma missão perto de você. Um bom truque: deixe o celular no suporte, com o app aberto e a tela ligada.</div></div>
+    </section>
+
+    <!-- ======================= 4 ======================= -->
+    <section id="s4">
+      <div class="sec-head">
+        <div class="sec-n">04</div>
+        <h2>Abrir o sistema no computador</h2>
+        <p>Para Líder de Mesa, Mesa Central e Administrador. Não instala nada: é um site.</p>
+      </div>
+
+      <ol class="steps">
+        <li><div class="st"><b>Abra o Google Chrome</b><span>Funciona em qualquer navegador moderno, mas o Chrome é o mais testado.</span></div></li>
+        <li><div class="st"><b>Vá para <a href="https://carros-mik.vercel.app">carros-mik.vercel.app</a></b><span>Vale salvar nos favoritos — é o mesmo endereço para Líder, Mesa Central e Administrador.</span></div></li>
+        <li><div class="st"><b>Entre com email e senha</b><span>Os mesmos que o Administrador cadastrou para você.</span></div></li>
+        <li><div class="st"><b>Permita as notificações</b><span>O navegador pergunta uma vez. Clique em <b>Permitir</b> — assim você é avisado mesmo com a aba em segundo plano.</span></div></li>
+        <li><div class="st"><b>O sistema já te leva para a sua tela</b><span>Líder cai direto em <b>Solicitações</b>. Mesa Central e Admin caem no <b>Dashboard</b>.</span></div></li>
+      </ol>
+
+      <div class="tip"><span class="ic">📌</span><div><b>Dica para o tablet da Mesa.</b> No Chrome, toque no menu <span class="mono">⋮</span> e escolha <b>Adicionar à tela inicial</b>. O sistema passa a abrir como se fosse um app, em tela cheia, sem a barra do navegador.</div></div>
+    </section>
+
+    <!-- ======================= 5 ======================= -->
+    <section id="s5">
+      <div class="sec-head">
+        <div class="sec-n">05</div>
+        <h2>Manual do Motorista</h2>
+        <p>Tudo acontece em uma tela só. Se não tem missão, ela fica esperando. Quando chega uma, ela aparece sozinha.</p>
+      </div>
+
+      <h3>Quando não tem missão</h3>
+      <div class="shot-row">
+        <div class="phone">
+          <div class="screen">
+            <div class="notch"><i></i></div>
+            <div class="ui-pad ui-row" style="justify-content:space-between">
+              <span style="font-size:17px">☰</span>
+              <span class="ui-row" style="gap:14px"><span style="font-size:15px">💬</span><span style="font-size:15px">🔔</span></span>
+            </div>
+            <div style="padding:56px 24px 64px; display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center">
+              <svg viewBox="0 0 180 90" width="96" height="48" aria-hidden="true" style="opacity:.75">
+                <rect width="180" height="90" rx="14" fill="#ffe4f1"/>
+                <g transform="translate(10,10)">
+                  <path d="M10 40c30-25 60-25 90 0 10 8 30-5 40 6-12 8-28 4-33 8-4 4-8 8-20 8H30c-8 0-20-10-20-22z" fill="#00a862"/>
+                  <circle cx="36" cy="30" r="8" fill="#fff"/><circle cx="36" cy="30" r="3" fill="#222"/>
+                  <circle cx="52" cy="28" r="6" fill="#fff"/><circle cx="52" cy="28" r="2.5" fill="#222"/>
+                </g>
+              </svg>
+              <div class="ui-title" style="font-size:17px">Aguardando tiro...</div>
+              <div class="ui-muted" style="max-width:200px">A Mesa Central vai notificar quando um tiro for atribuído</div>
+            </div>
+            <div class="ui-pad" style="padding-top:0">
+              <div class="ui-lbl" style="margin-bottom:8px">Histórico do dia</div>
+              <div class="ui-card" style="padding:10px 12px; gap:3px">
+                <div class="ui-row" style="justify-content:space-between">
+                  <span style="font-weight:600; font-size:12.5px">Busca histórica</span>
+                  <span class="chip c-done"><span class="d"></span>Achei</span>
+                </div>
+                <div class="ui-muted" style="font-size:11px">Prova 3 · Centro · 14:22</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="legend">
+          <li><span class="pin">☰</span><div><b>Menu</b><br><span>Abre a lateral com <b>Notificações</b> e <b>Sair</b>.</span></div></li>
+          <li><span class="pin">💬</span><div><b>Gestor de carros</b><br><span>Conversa privada entre você e o gestor. Ninguém mais lê.</span></div></li>
+          <li><span class="pin">🔔</span><div><b>Notificações</b><br><span>A bolinha vermelha mostra quantos avisos você ainda não abriu.</span></div></li>
+          <li><span class="pin on-doc">4</span><div><b>Histórico do dia</b><br><span>As missões que você já fechou hoje. Dá para <b>reabrir</b> uma delas se fechou por engano.</span></div></li>
+        </ol>
+      </div>
+
+      <h3>Quando chega uma missão</h3>
+      <div class="shot-row">
+        <div class="phone">
+          <div class="screen">
+            <div class="notch"><i></i></div>
+            <div class="ui-pad ui-row" style="justify-content:space-between; padding-bottom:6px">
+              <span style="font-size:17px">☰</span>
+              <span class="ui-row" style="gap:14px"><span style="font-size:15px">💬</span><span style="font-size:15px">🔔</span></span>
+            </div>
+            <div class="ui-pad" style="padding-top:4px">
+              <div class="ui-card">
+                <div class="ui-row" style="justify-content:space-between; align-items:flex-start; gap:8px">
+                  <div style="min-width:0">
+                    <div class="ui-title">Busca histórica</div>
+                    <div class="ui-muted">Prova 5</div>
+                  </div>
+                  <span class="chip c-busy"><span class="d"></span>A caminho</span>
+                  <span class="pin">1</span>
+                </div>
+                <div class="ui-row" style="justify-content:flex-end">
+                  <span class="chip c-pink">▲ +2</span><span class="pin">2</span>
+                </div>
+                <div class="ui-sep"></div>
+                <div class="ui-field"><span class="ui-lbl">Endereço</span><span class="v">Rua XV de Novembro, 1400 — Centro, Blumenau</span></div>
+                <div class="ui-field"><span class="ui-lbl">Objetivo</span><span class="v">Buscar o envelope lacrado com a recepção</span></div>
+                <div class="ui-field"><span class="ui-lbl">Líder</span><span class="v">Ana Prado · (47) 99999-0000</span></div>
+                <div class="ui-btn ui-row" style="justify-content:center; gap:8px">🗺 Abrir no Maps <span class="pin">3</span></div>
+                <div class="ui-btn green" style="text-align:center">Compartilhar no WhatsApp</div>
+                <div class="ui-btn" style="text-align:center">Ligar para Líder</div>
+                <div class="ui-btn solid ui-row" style="justify-content:center; gap:8px; padding:13px">Cheguei <span class="pin" style="background:rgba(0,0,0,.35)">4</span></div>
+                <div class="ui-row" style="gap:7px; align-items:stretch">
+                  <div class="ui-btn greensolid" style="flex:1; text-align:center">✓ Achei</div>
+                  <div class="ui-btn ghost" style="flex:1; text-align:center">✗ Não achei</div>
+                  <span class="pin" style="align-self:center">5</span>
+                </div>
+                <div class="ui-sep"></div>
+                <div class="ui-lbl">Comentários</div>
+                <div class="ui-row" style="gap:8px"><span class="ui-input" style="flex:1">Adicionar comentário…</span><span class="pin">6</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="legend">
+          <li><span class="pin">1</span><div><b>O seu status</b><br><span>Mostra em que ponto <b>o seu carro</b> está nesta missão. Muda sozinho quando você aperta o botão grande.</span></div></li>
+          <li><span class="pin">2</span><div><b>Fila (+2)</b><br><span>Quantas missões já estão reservadas para o seu carro depois desta. Toque para ver a posição e a prioridade de cada uma. Os detalhes só aparecem quando chegar a vez.</span></div></li>
+          <li><span class="pin">3</span><div><b>Abrir no Maps</b><br><span>Abre o Google Maps ou o Waze já com a rota traçada. Não precisa digitar endereço.</span></div></li>
+          <li><span class="pin">4</span><div><b>O botão rosa — onde você está</b><br><span>Mostra sempre o próximo passo do trajeto. O texto muda conforme você avança.</span></div></li>
+          <li><span class="pin">5</span><div><b>Achei / Não achei — o que aconteceu</b><br><span>Ficam na tela <b>desde o começo</b>, lado a lado. Não precisa esperar chegar em lugar nenhum para usar.</span></div></li>
+          <li><span class="pin">6</span><div><b>Comentários</b><br><span>Recado que o Líder e a Mesa Central leem. Use para avisar de trânsito, portão fechado, etc.</span></div></li>
+        </ol>
+      </div>
+
+      <h3>Os botões não são uma fila — são duas coisas separadas</h3>
+      <p class="body-txt">Esta é a parte que mais confunde quem abre o app pela primeira vez. Você não avança por um caminho único de “próximo, próximo, próximo”. Há <b>dois controles independentes</b> na tela ao mesmo tempo.</p>
+
+      <div class="grid-2">
+        <div class="card" style="border-left:4px solid var(--pink)">
+          <h4>1. O botão rosa — <i>onde você está</i></h4>
+          <p style="color:var(--ink-2); font-size:14.5px; margin:0">Marca o seu trajeto para o Líder e a Mesa Central acompanharem. O texto muda a cada toque:</p>
+          <div class="ui-row" style="gap:7px; flex-wrap:wrap; font-family:'Fira Code',monospace; font-size:12.5px; color:var(--ink-2)">
+            <span class="chip c-pink" style="font-size:11px">Iniciar</span> →
+            <span class="chip c-pink" style="font-size:11px">Cheguei</span> →
+            <span class="chip c-pink" style="font-size:11px">Retornando</span>
+          </div>
+          <p style="color:var(--ink-2); font-size:14.5px; margin:0">Depois de tocar em <b>Retornando</b> ele <b>some</b> — não existe um quarto toque. Se você esquecer de usar, nada trava: só significa que ninguém sabe por onde você anda.</p>
+        </div>
+
+        <div class="card" style="border-left:4px solid var(--ok)">
+          <h4>2. Achei / Não achei — <i>o que aconteceu</i></h4>
+          <p style="color:var(--ink-2); font-size:14.5px; margin:0">Ficam disponíveis <b>desde o momento em que a missão aparece</b>. Não precisa ter tocado no botão rosa nenhuma vez.</p>
+          <p style="color:var(--ink-2); font-size:14.5px; margin:0">Achou o alvo assim que chegou? Toque em <b>Achei</b> na hora. Nunca chegou a sair e já sabe que não vai dar? Toque em <b>Não achei</b>.</p>
+          <p style="color:var(--ink-2); font-size:14.5px; margin:0"><b>Tocou no errado?</b> Toque no outro. Dá para trocar enquanto a missão estiver aberta. O que está valendo fica aceso; o outro, apagado.</p>
+        </div>
+      </div>
+
+      <div class="note"><span class="ic">🏁</span><div><b>Encerrar missão só aparece depois.</b> O botão verde de encerrar não existe na tela até você reportar Achei ou Não achei. É o último passo, e é o único que libera o seu carro.</div></div>
+
+      <div class="warn"><span class="ic">⚠️</span><div><b>“Achei” não encerra a missão.</b> Depois de reportar, o app mostra: <i>“A missão segue aberta até alguém encerrar.”</i> Isso é de propósito — o Líder pode querer conferir antes. Alguém precisa apertar <b>Encerrar missão</b>: você, o Líder ou a Mesa Central. Só aí o seu carro fica livre para a próxima.</div></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4>Missão com mais de um carro</h4>
+          <p style="color:var(--ink-2); font-size:14.5px">Às vezes a Mesa manda dois ou três carros para o mesmo lugar. Você vê o número e o piloto dos outros carros — mas não vê onde eles estão. E o botão <b>Encerrar missão</b> só libera depois que <b>todos</b> tiverem reportado Achei ou Não achei. Enquanto falta alguém, o app diz de quem está esperando.</p>
+        </div>
+        <div class="card">
+          <h4>Fechou por engano?</h4>
+          <p style="color:var(--ink-2); font-size:14.5px">No <b>Histórico do dia</b>, toque no ícone de reabrir da missão. O desfecho que você marcou é apagado e a missão volta a ficar em andamento. Atenção: se o seu carro já tiver sido designado para outra missão nesse meio tempo, ele <b>não</b> volta para a antiga.</p>
+        </div>
+      </div>
+
+      <div class="note"><span class="ic">📍</span><div><b>Aviso de localização desativada.</b> Se aparecer uma tarja escrita <i>“Localização desativada — Mesa Central não consegue ver sua posição”</i>, ligue o GPS do celular e volte para o app. Enquanto essa tarja estiver lá, você é um carro invisível no mapa.</div></div>
+    </section>
+
+    <!-- ======================= 6 ======================= -->
+    <section id="s6">
+      <div class="sec-head">
+        <div class="sec-n">06</div>
+        <h2>Manual do Líder de Mesa</h2>
+        <p>Você tem uma tela só: um quadro com as suas solicitações, e um botão para abrir uma nova.</p>
+      </div>
+
+      <h3>O quadro das solicitações</h3>
+      <div class="shot">
+        <div class="scroll-x"><div class="win">
+          <div class="win-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="url">carros-mik.vercel.app</span>
+          </div>
+          <div class="ui-pad" style="display:flex; flex-direction:column; gap:12px; padding:16px">
+            <div class="ui-row" style="justify-content:space-between; flex-wrap:wrap; gap:8px">
+              <span class="ui-title">Minhas Solicitações</span>
+              <span class="ui-row" style="gap:8px">
+                <span class="ui-btn ghost" style="padding:6px 10px">Sair</span>
+                <span class="ui-btn solid ui-row" style="padding:6px 10px; gap:7px">+ Nova Solicitação <span class="pin" style="background:rgba(0,0,0,.35)">1</span></span>
+              </span>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px">
+              <div style="display:flex; flex-direction:column; gap:8px">
+                <div class="ui-row" style="gap:6px; background:var(--warn-bg); color:var(--warn); border:1px solid color-mix(in srgb,var(--warn) 30%,transparent); border-radius:8px; padding:5px 9px; font-size:11px; font-weight:700">Para fazer <span class="pin">2</span></div>
+                <div class="ui-card" style="padding:10px; gap:5px">
+                  <div style="font-weight:600; font-size:12px">Pista do relógio</div>
+                  <div class="ui-muted" style="font-size:10.5px">Etapa 4 · 15:02</div>
+                  <span class="chip c-open"><span class="d"></span>Aberta</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px">
+                <div class="ui-row" style="gap:6px; background:var(--info-bg); color:var(--info); border:1px solid color-mix(in srgb,var(--info) 30%,transparent); border-radius:8px; padding:5px 9px; font-size:11px; font-weight:700">Fazendo <span class="pin">3</span></div>
+                <div class="ui-card" style="padding:10px; gap:5px">
+                  <div style="font-weight:600; font-size:12px">Busca histórica</div>
+                  <div class="ui-muted" style="font-size:10.5px">Etapa 5 · 14:47</div>
+                  <span class="chip c-assigned"><span class="d"></span>Designado</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px">
+                <div class="ui-row" style="gap:6px; background:var(--ok-bg); color:var(--ok); border:1px solid color-mix(in srgb,var(--ok) 30%,transparent); border-radius:8px; padding:5px 9px; font-size:11px; font-weight:700">Feito <span class="pin">4</span></div>
+                <div class="ui-card" style="padding:10px; gap:5px">
+                  <div style="font-weight:600; font-size:12px">Foto da ponte</div>
+                  <div class="ui-muted" style="font-size:10.5px">Etapa 2 · 13:10</div>
+                  <span class="chip c-done"><span class="d"></span>Concluída</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div></div>
+        <ol class="legend" style="max-width:70ch">
+          <li><span class="pin">1</span><div><b>+ Nova Solicitação</b><br><span>O botão que você mais vai usar. Abre o formulário.</span></div></li>
+          <li><span class="pin">2</span><div><b>Para fazer</b><br><span>Pedidos que a Mesa Central ainda não despachou. Aqui ficam os status <b>Aberta</b> e <b>Em análise</b>.</span></div></li>
+          <li><span class="pin">3</span><div><b>Fazendo</b><br><span>Já tem carro a caminho. Status <b>Designado</b>.</span></div></li>
+          <li><span class="pin">4</span><div><b>Feito</b><br><span>Acabou — seja <b>Concluída</b> ou <b>Cancelada</b>.</span></div></li>
+        </ol>
+      </div>
+      <div class="tip"><span class="ic">⚡</span><div>Os cartões se movem sozinhos entre as colunas conforme a missão anda. Você não precisa recarregar a página nem apertar F5.</div></div>
+
+      <h3>Abrir uma solicitação</h3>
+      <p class="body-txt">Clique em <b>+ Nova Solicitação</b> e preencha. Leva menos de um minuto.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Campo</th><th>O que colocar</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><b>Prova</b></td><td>O nome da prova. Ex: <span class="mono">Busca histórica</span></td><td class="no">obrigatório</td></tr>
+            <tr><td><b>Etapa</b></td><td>O número da etapa. Ex: <span class="mono">3</span></td><td class="no">obrigatório</td></tr>
+            <tr><td><b>Líder</b></td><td>Escolha o seu nome na lista.</td><td class="no">obrigatório</td></tr>
+            <tr><td><b>Buscar endereço</b></td><td>Comece a digitar a rua e escolha na lista que aparece. Isso preenche rua, bairro e cidade <b>e marca o ponto exato no mapa do motorista</b>. É o jeito mais rápido e mais preciso.</td><td class="no">recomendado</td></tr>
+            <tr><td><b>Rua, Número, Bairro, Cidade</b></td><td>Se preferir, digite à mão. Cidade já vem como <span class="mono">Blumenau</span> — troque se for outra.</td><td class="no">obrigatório</td></tr>
+            <tr><td><b>Objetivo</b></td><td>O que precisa ser feito, em uma ou duas frases. É isso que o motorista lê. Ex: <span class="mono">Buscar o envelope lacrado com a recepção</span></td><td class="no">obrigatório</td></tr>
+            <tr><td><b>Link Maps</b></td><td>Só aparece se você digitou o endereço à mão. Se usou a busca, o sistema já tem a localização exata e nem pergunta.</td><td class="no">opcional</td></tr>
+            <tr><td><b>Observações</b></td><td>Qualquer coisa a mais: “falar com o João da portaria”, “o portão fecha às 18h”.</td><td class="no">opcional</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tip"><span class="ic">✅</span><div>Se aparecer <b>“Local exato capturado da busca”</b> em verde, você acertou: o motorista vai navegar direto para o ponto certo, sem procurar.</div></div>
+
+      <h3>Acompanhar e agir</h3>
+      <p class="body-txt">Clique em qualquer cartão para abrir o painel lateral. Lá você vê:</p>
+      <div class="grid-2">
+        <div class="card">
+          <h4>O que você vê</h4>
+          <ul style="margin:0; padding-left:18px; color:var(--ink-2); font-size:14.5px; display:flex; flex-direction:column; gap:6px">
+            <li>Endereço, objetivo e observações do pedido</li>
+            <li>Qual carro pegou (piloto e copiloto)</li>
+            <li>A linha do tempo: tudo que aconteceu e quando</li>
+            <li>O resultado: <b>Achei</b> ou <b>Não achei</b></li>
+            <li>Os comentários trocados na missão</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>O que você pode fazer</h4>
+          <ul style="margin:0; padding-left:18px; color:var(--ink-2); font-size:14.5px; display:flex; flex-direction:column; gap:6px">
+            <li><b>Comentar</b> — o motorista e a Mesa leem</li>
+            <li><b>Falar no WhatsApp</b> com o piloto ou com a Mesa</li>
+            <li><b>Cancelar solicitação</b> — só enquanto ainda não tem carro</li>
+            <li><b>Encerrar missão</b> — quando o carro já reportou e você confirmou que resolveu</li>
+            <li><b>Reabrir missão</b> — se encerrou cedo demais</li>
+          </ul>
+        </div>
+      </div>
+      <div class="warn"><span class="ic">⚠️</span><div><b>Cancelar não tem volta.</b> Depois de cancelada, a solicitação vai para a coluna <b>Feito</b> e não volta atrás — você precisa abrir uma nova. Já <b>encerrar</b> tem volta: existe o botão <b>Reabrir missão</b>.</div></div>
+    </section>
+
+    <!-- ======================= 7 ======================= -->
+    <section id="s7">
+      <div class="sec-head">
+        <div class="sec-n">07</div>
+        <h2>Manual da Mesa Central</h2>
+        <p>Esta é a tela de comando: a fila de pedidos de um lado, o mapa dos carros do outro.</p>
+      </div>
+
+      <h3>O Dashboard</h3>
+      <div class="shot">
+        <div class="scroll-x"><div class="win">
+          <div class="win-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="url">carros-mik.vercel.app</span>
+          </div>
+          <div style="display:grid; grid-template-columns:112px 200px 1fr; min-height:300px">
+            <!-- sidebar -->
+            <div style="background:var(--app-1); border-right:1px solid var(--app-3); padding:12px 9px; display:flex; flex-direction:column; gap:4px">
+              <div class="ui-row" style="gap:6px; margin-bottom:8px"><span style="font-weight:700; font-size:11px">Mesa Central</span><span class="pin">1</span></div>
+              <div style="background:var(--app-2); border-radius:7px; padding:5px 8px; font-size:11px; font-weight:600">Dashboard</div>
+              <div style="padding:5px 8px; font-size:11px; color:var(--app-muted)">Solicitações</div>
+              <div style="padding:5px 8px; font-size:11px; color:var(--app-muted)">Líderes</div>
+              <div style="padding:5px 8px; font-size:11px; color:var(--app-muted)">Carros</div>
+              <div style="padding:5px 8px; font-size:11px; color:var(--app-muted)">Chat dos Carros</div>
+              <div style="padding:5px 8px; font-size:11px; color:var(--app-muted)">Usuários</div>
+              <div style="margin-top:auto; border-top:1px solid var(--app-3); padding-top:8px" class="ui-row">
+                <span style="font-size:10.5px; color:var(--app-muted); flex:1">Baixar planilha</span><span class="pin">2</span>
+              </div>
+            </div>
+            <!-- painel de solicitações -->
+            <div style="border-right:1px solid var(--app-3); padding:11px; display:flex; flex-direction:column; gap:8px">
+              <div class="ui-row" style="justify-content:space-between"><span class="ui-lbl">Solicitações (3)</span><span class="pin">3</span></div>
+              <div class="ui-card" style="padding:9px; gap:4px; border-color:var(--pink)">
+                <div style="font-weight:600; font-size:11.5px">Pista do relógio</div>
+                <div class="ui-muted" style="font-size:10px">Ana Prado · Centro</div>
+                <span class="chip c-open"><span class="d"></span>Aberta</span>
+              </div>
+              <div class="ui-card" style="padding:9px; gap:4px">
+                <div style="font-weight:600; font-size:11.5px">Busca histórica</div>
+                <div class="ui-muted" style="font-size:10px">Léo Kraus · Itoupava</div>
+                <span class="chip c-assigned"><span class="d"></span>Designado</span>
+              </div>
+            </div>
+            <!-- mapa -->
+            <div style="position:relative; background:linear-gradient(150deg,#12121F,#1A1A30); padding:11px; display:flex; flex-direction:column; gap:7px">
+              <div class="ui-row" style="justify-content:flex-end; gap:6px">
+                <span class="ui-btn ghost" style="padding:4px 8px; font-size:10px">Abrir em outra tela</span><span class="pin">4</span>
+              </div>
+              <div style="align-self:flex-end; width:176px; display:flex; flex-direction:column; gap:5px">
+                <div class="ui-row" style="background:var(--app-1); border:1px solid var(--app-3); border-radius:7px; padding:5px 8px; font-size:10px; gap:6px">
+                  <span style="flex:1">Carros (4/7 disponíveis)</span><span class="pin">5</span>
+                </div>
+                <div style="background:var(--app-1); border:1px solid var(--app-3); border-radius:7px; padding:7px 8px; display:flex; flex-direction:column; gap:6px">
+                  <div class="ui-row" style="justify-content:space-between; gap:5px">
+                    <span style="font-size:10.5px; font-weight:600">Carro 03</span>
+                    <span class="ui-row" style="gap:4px"><span style="font-size:9px; border:1px solid var(--app-3); background:var(--app-2); border-radius:4px; padding:1px 5px">2 na fila</span><span class="chip c-busy" style="font-size:8.5px"><span class="d"></span>Em missão</span></span>
+                  </div>
+                  <div class="ui-row" style="justify-content:space-between">
+                    <span style="font-size:10.5px; font-weight:600">Carro 05</span>
+                    <span class="chip c-free" style="font-size:8.5px"><span class="d"></span>Disponível</span>
+                  </div>
+                </div>
+              </div>
+              <div style="flex:1; position:relative">
+                <span style="position:absolute; left:16%; top:38%; font-size:17px">🚗</span>
+                <span style="position:absolute; left:52%; top:20%; font-size:17px">🚗</span>
+                <span style="position:absolute; left:70%; top:62%; font-size:17px">📍</span>
+                <span class="pin" style="position:absolute; left:36%; top:74%">6</span>
+              </div>
+            </div>
+          </div>
+        </div></div>
+        <ol class="legend" style="max-width:70ch">
+          <li><span class="pin">1</span><div><b>Menu lateral</b><br><span>Dashboard, Solicitações, Líderes, Carros. <b>Usuários</b> e <b>Chat dos Carros</b> aparecem só para o Administrador.</span></div></li>
+          <li><span class="pin">2</span><div><b>Baixar planilha</b><br><span>Salva no computador uma planilha com missões, fila, carros, líderes e mensagens. Baixe <b>antes</b> se o sistema começar a ficar instável — e no fim do evento, sempre.</span></div></li>
+          <li><span class="pin">3</span><div><b>Fila de solicitações</b><br><span>O número entre parênteses é quanta coisa está esperando carro. Clique num cartão para abrir o painel de detalhes à direita.</span></div></li>
+          <li><span class="pin">4</span><div><b>Abrir em outra tela</b><br><span>Joga o mapa em uma janela separada — perfeito para um segundo monitor ou uma TV.</span></div></li>
+          <li><span class="pin">5</span><div><b>Lista de carros</b><br><span>Quantos estão livres, o status de cada um e quantas missões cada carro tem na fila. Clique em <b>N na fila</b> para ver e reordenar.</span></div></li>
+          <li><span class="pin">6</span><div><b>Mapa ao vivo</b><br><span>🚗 são os carros (posição atualizada a cada 10 segundos) e 📍 são os destinos das solicitações.</span></div></li>
+        </ol>
+      </div>
+
+      <h3>Mandar um carro</h3>
+      <ol class="steps">
+        <li><div class="st"><b>Clique no cartão da solicitação</b><span>O painel de detalhes abre pela direita, com endereço, objetivo, líder e telefone.</span></div></li>
+        <li><div class="st"><b>Escolha o carro em “Atribuir carro(s)”</b><span>Dá para marcar <b>mais de um carro</b> de uma vez, se a missão pedir. O botão muda para <span class="mono">Atribuir 2 carros</span>.</span></div></li>
+        <li><div class="st"><b>Confirme</b><span>O motorista recebe a notificação no celular em segundos e a solicitação vira <b>Designado</b>.</span></div></li>
+      </ol>
+
+      <div class="card">
+        <h4>Se o carro escolhido já está em missão</h4>
+        <p style="color:var(--ink-2); font-size:14.5px; margin:0">O sistema nunca tira um carro de uma missão sem perguntar. Aparece <b>“Carro ocupado — como atribuir?”</b> com duas opções lado a lado:</p>
+        <div class="grid-2" style="margin-top:4px">
+          <div style="border:1px solid var(--rule); border-radius:11px; padding:14px; display:flex; flex-direction:column; gap:6px">
+            <b style="font-size:14.5px">Enfileirar</b>
+            <span style="color:var(--ink-2); font-size:14px">Entra na fila do carro. Ele termina o que está fazendo e depois pega esta. <b>Não interrompe nada.</b></span>
+          </div>
+          <div style="border:1px solid var(--accent); border-radius:11px; padding:14px; display:flex; flex-direction:column; gap:6px; background:var(--accent-tint)">
+            <b style="font-size:14.5px">Transferir agora</b>
+            <span style="color:var(--ink-2); font-size:14px">Tira o carro da missão atual <b>imediatamente</b> e joga ele nesta. Use quando é urgente de verdade.</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Organizar a fila</h3>
+      <p class="body-txt">Cada carro tem sua própria fila. Na lista de carros, clique em <b>N na fila</b> para abrir e definir a prioridade de cada missão:</p>
+      <div class="ui-row" style="gap:10px; flex-wrap:wrap">
+        <span class="chip c-na" style="font-size:11px">Alta</span>
+        <span class="chip c-off" style="font-size:11px">Normal</span>
+        <span class="chip c-open" style="font-size:11px">Baixa</span>
+      </div>
+      <p class="body-txt">Quem está em <b>Alta</b> passa na frente. Entre missões de mesma prioridade, a mais antiga vem primeiro. O motorista vê a posição e a prioridade — mas não vê o conteúdo da missão antes de chegar a vez dele.</p>
+      <div class="note"><span class="ic">🔺</span><div>Se um carro ficar <b>Indisponível</b> mas ainda tiver missões reservadas, um alerta aparece do lado do número dele. Redistribua essas missões para outro carro.</div></div>
+
+      <h3>Outras ações no painel da solicitação</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Botão</th><th>O que faz</th><th>Quando usar</th></tr></thead>
+          <tbody>
+            <tr><td><b>Cutucar</b></td><td>Manda uma notificação para o motorista daquele carro, sem mexer na missão.</td><td>O carro não está respondendo e você quer chamar a atenção dele.</td></tr>
+            <tr><td><b>Remover</b></td><td>Tira <b>aquele</b> carro da missão. Os outros continuam.</td><td>Mandou o carro errado, ou o carro quebrou.</td></tr>
+            <tr><td><b>Em análise</b></td><td>Marca que o pedido está sendo avaliado, sem despachar ninguém ainda.</td><td>Você viu o pedido mas ainda está decidindo.</td></tr>
+            <tr><td><b>Cancelar</b></td><td>Encerra o pedido sem realizar. Não tem volta.</td><td>O pedido perdeu o sentido ou foi duplicado.</td></tr>
+            <tr><td><b>Encerrar missão</b></td><td>Fecha a missão e libera todos os carros.</td><td>Todos os carros já reportaram Achei / Não achei.</td></tr>
+            <tr><td><b>Reabrir missão</b></td><td>Volta a missão para em andamento e apaga os desfechos.</td><td>Encerrou cedo demais.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="warn"><span class="ic">↩️</span><div><b>Reabrir tem uma pegadinha.</b> Os carros voltam para a missão <b>só se ainda não tiverem sido designados para outra</b>. Os que já foram permanecem onde estão — o aviso na tela diz exatamente quais voltaram.</div></div>
+    </section>
+
+    <!-- ======================= 8 ======================= -->
+    <section id="s8">
+      <div class="sec-head">
+        <div class="sec-n">08</div>
+        <h2>Manual do Administrador</h2>
+        <p>Isso é o trabalho de antes do evento: colocar gente e carros dentro do sistema. Feito uma vez, não se mexe mais.</p>
+      </div>
+
+      <ol class="steps">
+        <li><div class="st"><b>Crie os usuários</b><span>Menu <b>Usuários → Novo Usuário</b>. Preencha nome, email, uma senha temporária e escolha o papel: <b>Motorista</b>, <b>Líder de Mesa</b>, <b>Operador Central</b> ou <b>Administrador</b>. Depois passe o email e a senha para a pessoa.</span></div></li>
+        <li><div class="st"><b>Cadastre os líderes</b><span>Menu <b>Líderes → Novo Líder</b>: nome, telefone e a mesa. O telefone é o que abre o WhatsApp e a ligação para o motorista.</span></div></li>
+        <li><div class="st"><b>Cadastre os carros</b><span>Menu <b>Carros → Novo Carro</b>: número do carro, piloto, telefone do piloto e, se tiver, copiloto e telefone.</span></div></li>
+        <li><div class="st"><b>Ligue o carro ao motorista</b><span>Ainda no cadastro do carro, no campo <b>Motorista (app)</b>, escolha o usuário que vai usar o celular. <b>Este é o passo mais esquecido</b> — sem ele o app mostra “Carro não configurado para este usuário”.</span></div></li>
+        <li><div class="st"><b>Envie o convite do app para cada motorista</b><span>É separado do login que você acabou de criar: o convite chega no e-mail da pessoa (TestFlight no iPhone, Firebase no Android). Faça com antecedência.</span></div></li>
+      </ol>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4>Chat dos Carros</h4>
+          <p style="color:var(--ink-2); font-size:14.5px">Uma conversa privada entre você e cada carro, separada da missão. À esquerda a lista de carros, à direita a conversa. <b>Só você e aquele carro veem</b> — o Líder e os outros carros não. Use para coordenação, bronca, elogio, combinado de horário.</p>
+        </div>
+        <div class="card">
+          <h4>Status dos carros</h4>
+          <p style="color:var(--ink-2); font-size:14.5px">Na tela <b>Carros</b> você marca um carro como <b>Indisponível</b> (pneu furado, motorista almoçando) para que ele pare de aparecer como opção na hora de despachar. Quando voltar, marque como <b>Disponível</b>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= 9 ======================= -->
+    <section id="s9">
+      <div class="sec-head">
+        <div class="sec-n">09</div>
+        <h2>Dicionário de cores e status</h2>
+        <p>Todo mundo lê a mesma cor com o mesmo significado. Vale a pena decorar estes.</p>
+      </div>
+
+      <h3>Status da solicitação</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Etiqueta</th><th>Significa</th><th>Coluna do quadro</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip c-open"><span class="d"></span>Aberta</span></td><td>Pedido criado, ainda sem carro.</td><td>Para fazer</td></tr>
+            <tr><td><span class="chip c-review"><span class="d"></span>Em análise</span></td><td>A Mesa Central viu e está decidindo.</td><td>Para fazer</td></tr>
+            <tr><td><span class="chip c-assigned"><span class="d"></span>Designado</span></td><td>Tem pelo menos um carro na missão.</td><td>Fazendo</td></tr>
+            <tr><td><span class="chip c-done"><span class="d"></span>Concluída</span></td><td>Alguém apertou Encerrar missão.</td><td>Feito</td></tr>
+            <tr><td><span class="chip c-cancel"><span class="d"></span>Cancelada</span></td><td>Encerrada sem ser realizada.</td><td>Feito</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Status do carro na missão (o que o motorista marca)</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Etiqueta</th><th>Significa</th><th>Texto do botão rosa</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip c-assigned"><span class="d"></span>Designado</span></td><td>Recebeu, ainda não saiu.</td><td><span class="mono">Iniciar</span></td></tr>
+            <tr><td><span class="chip c-busy"><span class="d"></span>A caminho</span></td><td>Está dirigindo até o local.</td><td><span class="mono">Cheguei</span></td></tr>
+            <tr><td><span class="chip c-busy"><span class="d"></span>No local</span></td><td>Chegou e está resolvendo.</td><td><span class="mono">Retornando</span></td></tr>
+            <tr><td><span class="chip c-busy"><span class="d"></span>Retornando</span></td><td>Terminou e está voltando.</td><td>— o botão some</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Situação do carro na frota</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Etiqueta</th><th>Significa</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip c-free"><span class="d"></span>Disponível</span></td><td>Livre, pode receber missão.</td></tr>
+            <tr><td><span class="chip c-busy"><span class="d"></span>Em missão</span></td><td>Já está em uma missão.</td></tr>
+            <tr><td><span class="chip c-off"><span class="d"></span>Offline</span></td><td>O app não está enviando posição. Provavelmente fechado ou sem sinal.</td></tr>
+            <tr><td><span class="chip c-na"><span class="d"></span>Indisponível</span></td><td>Marcado como fora de operação pela Mesa Central.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note"><span class="ic">ℹ️</span><div><b>Achei e Não achei não estão nesta tabela de propósito.</b> Eles não são um status de trajeto e não dependem dele — ficam disponíveis o tempo todo, em qualquer uma das quatro linhas acima.</div></div>
+
+      <h3>Resultado da missão</h3>
+      <div class="ui-row" style="gap:12px; flex-wrap:wrap">
+        <span class="chip c-done" style="font-size:11px">✓ Achei</span>
+        <span class="chip c-review" style="font-size:11px">✗ Não achei</span>
+      </div>
+      <p class="body-txt">Cada carro reporta o seu próprio resultado. Numa missão com três carros, pode ter dois “Não achei” e um “Achei” — e todos ficam registrados.</p>
+    </section>
+
+    <!-- ======================= 10 ======================= -->
+    <section id="s10">
+      <div class="sec-head">
+        <div class="sec-n">10</div>
+        <h2>Deu problema?</h2>
+        <p>Os nove casos que mais aparecem, e o que fazer em cada um.</p>
+      </div>
+
+      <div class="faq">
+        <details>
+          <summary>O app diz “Carro não configurado para este usuário”</summary>
+          <div class="ans">
+            <p>O seu login existe, mas ninguém ligou ele a um carro.</p>
+            <p><b>Solução:</b> o Administrador abre <b>Carros</b>, edita o seu carro e escolhe você no campo <b>Motorista (app)</b>. Feche e abra o app de novo.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Aparece “Acesso não configurado. Contate a Mesa Central.”</summary>
+          <div class="ans">
+            <p>O usuário foi criado sem papel definido.</p>
+            <p><b>Solução:</b> o Administrador abre <b>Usuários</b> e define o papel certo (Motorista, Líder de Mesa, Operador Central ou Administrador).</p>
+          </div>
+        </details>
+        <details>
+          <summary>Não estou recebendo notificação de missão</summary>
+          <div class="ans">
+            <p>Três coisas para conferir, nesta ordem:</p>
+            <p>1. As notificações do app estão permitidas nos <b>Ajustes do celular</b>?<br>2. O celular está com internet (4G ou wi-fi)?<br>3. O app está aberto ou pelo menos rodando em segundo plano?</p>
+            <p>Enquanto isso, a tela de missão também atualiza sozinha — se você estiver com o app aberto, a missão aparece mesmo sem a notificação.</p>
+          </div>
+        </details>
+        <details>
+          <summary>A Mesa Central diz que não me vê no mapa</summary>
+          <div class="ans">
+            <p>A sua posição só é enviada com o <b>app aberto</b> e o <b>GPS ligado</b>.</p>
+            <p><b>Solução:</b> ligue a localização do celular, permita o acesso quando o app pedir, e deixe o app aberto na tela. Se aparecer a tarja “Localização desativada”, é exatamente esse o problema.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Reportei “Achei” mas a missão continua aberta</summary>
+          <div class="ans">
+            <p>Está certo. Reportar o resultado não encerra a missão — é de propósito, para o Líder poder conferir antes.</p>
+            <p><b>Solução:</b> alguém precisa apertar <b>Encerrar missão</b>: você, o Líder ou a Mesa Central. Só depois disso o carro fica livre.</p>
+          </div>
+        </details>
+        <details>
+          <summary>O botão “Encerrar missão” está apagado</summary>
+          <div class="ans">
+            <p>Ainda falta algum carro reportar o resultado. Logo abaixo do botão o sistema diz de quem está esperando: <i>“Aguardando o desfecho do carro 05.”</i></p>
+            <p><b>Solução:</b> chame esse carro no rádio, no comentário da missão ou pelo botão <b>Cutucar</b>.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Encerrei a missão sem querer</summary>
+          <div class="ans">
+            <p>Dá para voltar atrás com <b>Reabrir missão</b>, no painel da solicitação (ou no Histórico do dia, no app).</p>
+            <p><b>Atenção:</b> os carros voltam só se ainda não tiverem sido mandados para outra missão. Os que já foram permanecem onde estão.</p>
+          </div>
+        </details>
+        <details>
+          <summary>O Android diz que o app é perigoso e não deixa instalar</summary>
+          <div class="ans">
+            <p>É o comportamento normal do Android para qualquer app que não vem da Play Store. O nosso é distribuído direto para os motoristas, então cai nessa regra.</p>
+            <p><b>Solução:</b> na tela vermelha, marque <b>“Estou ciente dos possíveis riscos”</b> e toque em <b>OK</b> — o botão libera depois de alguns segundos. Se o celular tiver bloqueado de vez, vá em <b>Ajustes → Apps → Acesso especial → Instalar apps desconhecidos</b> e libere para o navegador que você usou.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Esqueci a senha / não recebi o login</summary>
+          <div class="ans">
+            <p>Não existe “esqueci minha senha” neste sistema — as contas são criadas na mão.</p>
+            <p><b>Solução:</b> peça ao Administrador. Ele cria um novo acesso com uma senha temporária e te passa.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="note"><span class="ic">🆘</span><div><b>Plano B de sempre.</b> O sistema não substitui o rádio nem o WhatsApp — ele organiza. Se alguma coisa travar no meio da gincana, resolva pelo telefone e depois registre no sistema. Todos os cartões trazem o telefone do líder e do piloto, prontos para ligar ou abrir o WhatsApp.</div></div>
+    </section>
+
+    <!-- ======================= 11 ======================= -->
+    <section id="s11">
+      <div class="sec-head">
+        <div class="sec-n">11</div>
+        <h2>Cartão de bolso</h2>
+        <p>Imprima ou tire um print desta parte. É o resumo que resolve 90% das dúvidas no dia.</p>
+      </div>
+
+      <div class="pocket">
+        <div class="blk">
+          <h4>🚗 MOTORISTA — app no celular</h4>
+          <ul>
+            <li>Deixe o <b>app aberto</b> — é assim que a Mesa te vê no mapa.</li>
+            <li>Missão nova chega sozinha na tela + notificação.</li>
+            <li>Botão rosa marca o trajeto: <b>Iniciar → Cheguei → Retornando</b>.</li>
+            <li><b>Achei / Não achei</b> valem desde o começo — não espere o trajeto.</li>
+            <li>Errou o desfecho? Toque no outro, dá para trocar.</li>
+            <li>Por último: <b>Encerrar missão</b> — sem isso o carro não fica livre.</li>
+            <li><b>+N</b> rosa = quantas missões esperam por você.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h4>📋 LÍDER DE MESA — site</h4>
+          <ul>
+            <li><b>+ Nova Solicitação</b> e preencha. Use a <b>busca de endereço</b>.</li>
+            <li>Escreva o objetivo claro: é o que o motorista lê.</li>
+            <li>Acompanhe pelas colunas: <b>Para fazer → Fazendo → Feito</b>.</li>
+            <li>Clique no cartão para comentar ou chamar no WhatsApp.</li>
+            <li><b>Cancelar</b> não tem volta. <b>Encerrar</b> tem.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h4>🎯 MESA CENTRAL — site</h4>
+          <ul>
+            <li>Clique no pedido → escolha o carro → confirme.</li>
+            <li>Carro ocupado: <b>Enfileirar</b> (espera) ou <b>Transferir agora</b> (urgente).</li>
+            <li>Use <b>Alta / Normal / Baixa</b> para ordenar a fila de cada carro.</li>
+            <li><b>Cutucar</b> quando o carro sumir.</li>
+            <li><b>Baixe a planilha</b> no fim do evento — e ao primeiro sinal de instabilidade.</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <h4>🔧 ADMINISTRADOR — antes do evento</h4>
+          <ul>
+            <li>Crie <b>usuários</b> com papel e senha temporária.</li>
+            <li>Cadastre <b>líderes</b> com telefone certo.</li>
+            <li>Cadastre <b>carros</b> com piloto e telefone.</li>
+            <li>Não esqueça de ligar o carro ao <b>Motorista (app)</b>.</li>
+            <li>Envie os convites do app com antecedência — é separado do login.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer class="wrap">
+  <div>Manual dos Carros de Apoio · Gincana Mik Dundee, Blumenau.</div>
+  <div>As telas mostradas são ilustrações fiéis do aplicativo e do site, com os mesmos textos e cores que você vai encontrar na hora de usar.</div>
+</footer>
+
+</body>
+</html>

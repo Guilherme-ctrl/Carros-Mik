@@ -3,6 +3,7 @@ import toast, { Toaster, ToastBar } from 'react-hot-toast'
 import { CreateUserPage } from './features/admin/CreateUserPage'
 import { AuthProvider } from './features/auth/AuthProvider'
 import { LoginPage } from './features/auth/LoginPage'
+import { ManuaisPage } from './features/manuais/ManuaisPage'
 import { useAuth } from './features/auth/useAuth'
 import { useNotifications } from './features/notifications/useNotifications'
 import { CarsPage } from './features/cars/CarsPage'
@@ -76,6 +77,10 @@ export default function App() {
         </Toaster>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          {/* Publica de proposito: o folder de instalacao e o que a
+              pessoa precisa ANTES de conseguir entrar. Exigir login
+              aqui seria trancar o manual do lado de dentro. */}
+          <Route path="/manuais" element={<ErrorBoundary><ManuaisPage /></ErrorBoundary>} />
           <Route path="/" element={<ProtectedRoute><RoleRoute /></ProtectedRoute>} />
           <Route
             path="/dashboard/map-window"

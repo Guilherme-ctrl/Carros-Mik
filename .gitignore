@@ -27,3 +27,6 @@ dist-ssr
 # Resíduo: scratch do AI-DLC que vazou para dentro deste pacote. O workspace de
 # verdade fica na raiz do monorepo.
 aidlc/
+
+# Configuração local do Claude Code (preview/dev), não é do projeto
+.claude/

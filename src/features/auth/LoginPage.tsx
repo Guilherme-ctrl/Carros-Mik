@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { Button } from '../../shared/components/ui/Button'
 import { Card, CardContent, CardHeader } from '../../shared/components/ui/Card'
 import { Input } from '../../shared/components/ui/Input'
@@ -73,6 +73,16 @@ export function LoginPage() {
                 Entrar
               </Button>
             </form>
+
+            {/* Aqui, e não só no menu de dentro: quem não consegue entrar é
+                exatamente quem mais precisa do manual, e essa é a única tela
+                que essa pessoa alcança. */}
+            <p className="mt-5 text-center text-sm text-zinc-500">
+              Primeira vez, ou não consegue entrar?{' '}
+              <Link to="/manuais" className="text-[#E91E8C] hover:text-[#FF4DB2] transition-colors">
+                Veja os manuais
+              </Link>
+            </p>
           </CardContent>
         </Card>
       </div>
