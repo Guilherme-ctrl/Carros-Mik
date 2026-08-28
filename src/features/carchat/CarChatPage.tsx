@@ -3,6 +3,7 @@ import toast from 'react-hot-toast'
 import { Button } from '../../shared/components/ui/Button'
 import { useCars } from '../cars/useCars'
 import { useCarMessages } from './useCarMessages'
+import { useNudgeCar } from '../notifications/useNudgeCar'
 
 function hora(iso: string): string {
   return new Intl.DateTimeFormat('pt-BR', {
@@ -14,6 +15,7 @@ function hora(iso: string): string {
 // Conversa privada do gestor com cada carro. Rota restrita ao Administrador —
 // mas quem de fato garante o sigilo é a RLS de car_messages, não esta rota.
 export function CarChatPage() {
+  const { nudge, nudgingCarId } = useNudgeCar()
   const { cars, getCars } = useCars()
   const [selectedCarId, setSelectedCarId] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
@@ -70,13 +72,29 @@ export function CarChatPage() {
           </div>
         ) : (
           <>
-            <div className="px-5 py-3 border-b border-zinc-800 shrink-0">
-              <p className="text-zinc-100 text-sm font-semibold">
-                Carro {selectedCar.number} — {selectedCar.pilot_name}
-              </p>
-              <p className="text-zinc-500 text-xs">
-                Conversa privada: só você e este carro veem.
-              </p>
+            <div className="px-5 py-3 border-b border-zinc-800 shrink-0 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-zinc-100 text-sm font-semibold truncate">
+                  Carro {selectedCar.number} — {selectedCar.pilot_name}
+                </p>
+                <p className="text-zinc-500 text-xs">
+                  Conversa privada: só você e este carro veem.
+                </p>
+              </div>
+              {/* Aqui é onde a necessidade aparece: você escreveu, ninguém
+                  respondeu, e o próximo passo é fazer o celular tocar. Sem
+                  isto era preciso sair do chat, achar uma missão daquele carro
+                  no Dashboard e cutucar de lá — e se o carro não estivesse em
+                  missão nenhuma, não havia caminho.
+                  Sem requestId: o RPC aceita nulo e o push sai igual. */}
+              <button
+                onClick={() => nudge(selectedCar.id, selectedCar.number)}
+                disabled={nudgingCarId === selectedCar.id}
+                title="Enviar uma notificação para o motorista deste carro"
+                className="shrink-0 rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:border-amber-500/50 hover:text-amber-400 hover:bg-amber-500/10 disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+              >
+                {nudgingCarId === selectedCar.id ? '…' : '👉 Cutucar'}
+              </button>
             </div>
 
             <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2">
