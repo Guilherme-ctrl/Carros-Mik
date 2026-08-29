@@ -6,12 +6,29 @@ import { Input } from '../../shared/components/ui/Input'
 import { AddressAutocompleteInput } from '../../shared/components/ui/AddressAutocompleteInput'
 import { useLeaders } from '../leaders/useLeaders'
 import { useRequests } from './useRequests'
+import {
+  lerEnderecoColado,
+  lerLinkMaps,
+  resolverEndereco,
+  validarEndereco,
+  type ModoEndereco,
+} from './enderecoDaSolicitacao'
 
 export function NewRequestPage() {
   const navigate = useNavigate()
   const { leaders, getLeaders } = useLeaders({ activeOnly: true })
   const { createRequest } = useRequests()
 
+  // Dois jeitos de dizer onde é. O link cobre o caso comum de quem já tem o
+  // lugar aberto no Maps e não quer transcrever endereço — o app do motorista
+  // abre maps_link antes de olhar coordenada, então o link chega inteiro nele.
+  const [modo, setModo] = useState<ModoEndereco>('endereco')
+  // Se a referência foi digitada à mão, o link não a sobrescreve. Sem esta
+  // marca, colar um segundo link apagaria o texto que a pessoa escreveu.
+  const [refAutomatica, setRefAutomatica] = useState(false)
+  // Avisa que o campo do link recebeu um endereço e o formulário se reorganizou
+  // sozinho — sem isto a troca de modo pareceria bug.
+  const [vindoDeEndereco, setVindoDeEndereco] = useState(false)
   const [event, setEvent] = useState('')
   const [stage, setStage] = useState('')
   const [leaderId, setLeaderId] = useState('')
@@ -35,6 +52,41 @@ export function NewRequestPage() {
     getLeaders()
   }, [getLeaders])
 
+  // Tenta ler coordenada e nome do link. Não achar é resultado normal — link
+  // curto do celular não carrega nada — então aqui não há erro, aviso nem
+  // bloqueio: o que der certo preenche, o resto a pessoa digita.
+  function aoMudarLink(valor: string) {
+    setMapsLink(valor)
+    clearError('mapsLink')
+
+    // O menu do Maps oferece "copiar link" E o endereço em texto. Quem colou o
+    // endereço colou o dado mais completo dos dois — recusar seria punir o
+    // acerto. Reconhecendo, o formulário se reorganiza para o modo endereço,
+    // que é onde esses campos cabem.
+    const end = lerEnderecoColado(valor)
+    if (end) {
+      setModo('endereco')
+      setStreet(end.street)
+      setStreetNumber(end.streetNumber)
+      setNeighborhood(end.neighborhood)
+      setCity(end.city)
+      setMapsLink('')
+      setCoords(null)
+      setRefAutomatica(false)
+      setVindoDeEndereco(true)
+      setErrors({})
+      return
+    }
+
+    const { coords: doLink, nome } = lerLinkMaps(valor)
+    setCoords(doLink)
+    if (nome && (refAutomatica || !street.trim())) {
+      setStreet(nome)
+      setRefAutomatica(true)
+      clearError('street')
+    }
+  }
+
   function clearError(field: string) {
     if (errors[field]) {
       setErrors((prev) => {
@@ -50,11 +102,10 @@ export function NewRequestPage() {
     if (!event.trim()) e.event = 'Campo obrigatório'
     if (!stage.trim()) e.stage = 'Campo obrigatório'
     if (!leaderId) e.leaderId = 'Selecione um líder'
-    if (!street.trim()) e.street = 'Campo obrigatório'
-    if (!streetNumber.trim()) e.streetNumber = 'Campo obrigatório'
-    if (!neighborhood.trim()) e.neighborhood = 'Campo obrigatório'
-    if (!city.trim()) e.city = 'Campo obrigatório'
     if (!objective.trim()) e.objective = 'Campo obrigatório'
+    Object.assign(e, validarEndereco({
+      modo, street, streetNumber, neighborhood, city, mapsLink, coords,
+    }))
     return e
   }
 
@@ -72,14 +123,10 @@ export function NewRequestPage() {
         leader_id: leaderId,
         event: event.trim(),
         stage: stage.trim(),
-        street: street.trim(),
-        street_number: streetNumber.trim(),
-        neighborhood: neighborhood.trim(),
-        city: city.trim(),
-        latitude: coords?.lat ?? null,
-        longitude: coords?.lng ?? null,
+        ...resolverEndereco({
+          modo, street, streetNumber, neighborhood, city, mapsLink, coords,
+        }),
         objective: objective.trim(),
-        maps_link: mapsLink.trim() || null,
         notes: notes.trim() || null,
       })
       toast.success('Solicitação aberta!')
@@ -152,6 +199,94 @@ export function NewRequestPage() {
               {errors.leaderId && <p className="text-xs text-red-400">{errors.leaderId}</p>}
             </div>
 
+            {/* O líder às vezes já tem o lugar aberto no Maps e transcrever
+                o endereço é o passo mais caro do formulário. Dois caminhos,
+                escolhidos aqui em cima para o resto do bloco fazer sentido. */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm font-medium text-zinc-300">Onde é</span>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  ['endereco', 'Tenho o endereço'],
+                  ['link', 'Tenho o link do Maps'],
+                ] as const).map(([valor, rotulo]) => (
+                  <button
+                    key={valor}
+                    type="button"
+                    onClick={() => {
+                      setModo(valor)
+                      setErrors({})
+                      // A coordenada pertence ao caminho que a produziu.
+                      setCoords(null)
+                      setRefAutomatica(false)
+                      setVindoDeEndereco(false)
+                    }}
+                    disabled={loading}
+                    aria-pressed={modo === valor}
+                    className={`rounded-lg border px-3 py-2 text-sm transition-colors disabled:opacity-50 ${
+                      modo === valor
+                        ? 'border-[#E91E8C] bg-[#E91E8C]/10 text-zinc-100 font-medium'
+                        : 'border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200'
+                    }`}
+                  >
+                    {rotulo}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {modo === 'endereco' && vindoDeEndereco && (
+              <p className="text-xs text-green-400">
+                ✓ Reconheci um endereço no lugar do link — preenchi os campos abaixo.
+              </p>
+            )}
+
+            {modo === 'link' ? (
+              <>
+                <Input
+                  label="Link do Maps"
+                  placeholder="Cole o link ou o endereço copiado do Maps"
+                  value={mapsLink}
+                  onChange={(e) => aoMudarLink(e.target.value)}
+                  error={errors.mapsLink}
+                  disabled={loading}
+                />
+                {/* Vai para a coluna `street`. O motorista lê isto na tela
+                    dirigindo — um ponto de referência serve melhor que um
+                    endereço completo, e mantém a linha do app legível. */}
+                <Input
+                  label="Ponto de referência"
+                  placeholder="Ex: Posto Ipiranga da Rua XV"
+                  value={street}
+                  onChange={(e) => {
+                    setStreet(e.target.value)
+                    setRefAutomatica(false)
+                    clearError('street')
+                  }}
+                  error={errors.street}
+                  disabled={loading}
+                />
+                <Input
+                  label="Cidade"
+                  placeholder="Ex: Blumenau"
+                  value={city}
+                  onChange={(e) => { setCity(e.target.value); clearError('city') }}
+                  error={errors.city}
+                  disabled={loading}
+                />
+                {coords ? (
+                  <p className="text-xs text-green-400">
+                    ✓ Local exato lido do link — a missão já nasce com o ponto no mapa.
+                  </p>
+                ) : (
+                  <p className="text-xs text-zinc-500">
+                    Link copiado da barra do navegador preenche a referência sozinho.
+                    O link curto do celular não preenche — mas funciona igual: o
+                    motorista abre ele direto no app de mapas.
+                  </p>
+                )}
+              </>
+            ) : (
+              <>
             <AddressAutocompleteInput
               onSelect={({ street: s, neighborhood: n, city: c, latitude, longitude, houseNumber }) => {
                 setStreet(s)
@@ -219,6 +354,9 @@ export function NewRequestPage() {
                 disabled={loading}
               />
             </div>
+              </>
+            )}
+
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="objective" className="text-sm font-medium text-zinc-300">
@@ -243,7 +381,7 @@ export function NewRequestPage() {
                 motorista, e agora a coordenada da busca dá isso de graça. Some
                 do caminho comum, mas continua sendo a saída de emergência de
                 quem digitou o endereço à mão. */}
-            {coords ? (
+            {modo === 'endereco' && (coords ? (
               <p className="text-xs text-green-400">
                 ✓ Local exato capturado da busca — o motorista vai navegar direto
                 para cá.
@@ -256,7 +394,7 @@ export function NewRequestPage() {
                 onChange={(e) => setMapsLink(e.target.value)}
                 disabled={loading}
               />
-            )}
+            ))}
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="notes" className="text-sm font-medium text-zinc-300">
